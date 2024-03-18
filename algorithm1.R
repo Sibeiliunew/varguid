@@ -1,5 +1,5 @@
 
-
+###
 p=5;n=1000;r1=rep(1,p);r2=rep(0.3,p);sig=1# real value
 p2=5
 
