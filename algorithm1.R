@@ -51,7 +51,8 @@ gamma_est1=function(beta,sig){
 #gamma0=rep(0.2,p) # initial
 beta=coef(lm(Y~.-1,data=df))
 sig = summary(lm(Y~.-1,data=df))$sigma
-sum(abs(beta-rep(1,5)))
+sum(abs(beta-rep(1,5))) # the results from OLS
+
 gamma=gamma_est1(beta,sig=sig) #rep(0.3,5)#
 diff1=diff2=10
 
