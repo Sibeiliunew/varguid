@@ -1,100 +1,67 @@
 
 ###
-p=5;n=1000;r1=rep(1,p);r2=rep(0.3,p);sig=1# real value
+p=5;n=1000;beta=rep(1,p);gamma=rep(0.3,p);sig=1# real value
 p2=5
 
 tol=exp(-10)
-dat_sim=function(n,p,p2,r1,sig){
-  X=matrix(rnorm(n=n*p, mean =0, sd = .2),nrow=n) # small sd of X
+dat_sim=function(n,p,p2,beta,sig){
+  X=matrix(rnorm(n=n*p, mean =0, sd = 1),nrow=n) # small sd of X
   e=rnorm(n,sd = sig)
-  Y1=X %*% r1+e  
-  X2=X[,1:p2]
-  Y2= X %*% r1+ X2%*% r2 *e  
-  return(list(X=X, Y=Y2,X2=X2))
+  Y= X %*% beta+ X%*% gamma *e  
+  return(list(X=X, Y=Y))
 }
 
-data=dat_sim(n,p,p2,r1,sig = sig)
+data=dat_sim(n,p,p2,beta,sig = sig)
 X=data[[1]]
 Y=data[[2]]
-X2=data[[3]]
 df=data.frame(X,Y=Y)
 ######################################################## from Dr. Lu's pdf
 
-beta_est2=function(gamma){
-  W=NULL
+w_est <- function(gamma){
+  W <- NULL
   for (i in 1:n){
-    new=1/abs((t(X[i,])%*% gamma))
-    W=c(W,new)
+    new <- 1/((t(X[i,]^2)%*% gamma))
+    W <- c(W,new)
   }
-  W=diag(W)
-  beta=solve(t(X) %*% t(W)%*%W%*%X) %*%t(X)%*% t(W)%*%W %*%Y
+  W <- diag(W)
+  return(W)
+}
+
+beta_est=function(gamma){
+  W <- w_est(gamma)
+  beta <- solve(t(X) %*% W%*%X) %*%t(X)%*% W %*%Y
   return(beta)
 }
 
 
-sig_est=function(beta,gamma){
-  sig=0
-  for (i in 1:n){
-    numerator=(Y[i]-c(crossprod(X[i,],beta)))^2
-    denumerator=(t(X[i,]) %*% gamma)^2
-    sig=sig+numerator/denumerator
-  }
-  return(sig/(n-2*p))
-}
-
-gamma_est1=function(beta,sig){
-  gamma=(solve(t(X)%*% X) %*% t(X) %*% abs(Y-X%*% beta ))
-  gamma=abs(gamma)/as.numeric(sig)
+gamma_est=function(beta){
+  X2 <- X^2
+  gamma <- (solve(t(X2)%*% X2) %*% t(X2) %*% (Y-X%*% beta )^2)
   return(gamma)
 }
-
+##### check if the above result is correct
+beta_est(rep(0.3^2,p))
+gamma_est(rep(1,p))
 #gamma0=rep(0.2,p) # initial
-beta=coef(lm(Y~.-1,data=df))
-sig = summary(lm(Y~.-1,data=df))$sigma
-sum(abs(beta-rep(1,5))) # the results from OLS
+beta=rep(0.5,p)
+sum(abs(coef(lm(Y~.-1,data=df))-rep(1,5))) # the results from OLS
+diff1 <- diff2 <- 10
+# gamma=gamma_est(beta,sig=sig) #rep(0.3,5)#
+gamma=gamma_est(beta)
 
-gamma=gamma_est1(beta,sig=sig) #rep(0.3,5)#
-diff1=diff2=10
-
-tol = 0.01
-while ( diff1 >tol & diff2 >tol ) {
-  old_beta=beta
-  old_gamma=gamma
-  beta=beta_est2(gamma) 
-  sig=sqrt(sig_est(beta,gamma))
-  gamma=gamma_est1(beta,sig=sig) 
+tol <- M <-  exp(-100)
+allbeta <- allgamma <- c()
+while ( diff1 > tol & M < 100) { #diff2 >tol & 
+  old_beta <- beta 
+  old_gamma <- gamma 
+  beta <- beta_est(gamma)
+  gamma=gamma_est(beta) 
   diff1=sum((beta-old_beta)^2)
-  diff2=sum((gamma-old_gamma)^2)
+  M <- M + 1
 }
+
 beta
 sum(abs(beta-rep(1,5)))
-gamma
-sig
-
-####################################################################################
-####################################################################################
-########### from Sibei calculation
-gamma_est2=function(beta,sig){
-  gamma_square=(1/sig^2) %*% solve(t(X)%*% X) %*% (Y-X%*% beta)^2
-  return(sqrt(gamma_square))
-}
-
-gamma0=rep(0.7,p) # initial
-beta=beta_est2(gamma0)
-gamma=gamma_est2(beta,sig=1)
-diff1=diff2=10
-
-while ( diff1 >tol & diff1 >tol ) {
-  old_beta=beta
-  old_gamma=gamma
-  beta=beta_est2(gamma) 
-  gamma=gamma_est2(beta,sig=1) 
-  diff1=sum((beta-old_beta)^2)
-  diff2=sum((gamma-old_gamma)^2)
-}
-beta
-gamma
-sig=sqrt(sig_est(beta,gamma))
-sig
+sqrt(abs(gamma)) ## since the estimated gamma is actually gamma^2
 
 
