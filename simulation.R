@@ -99,4 +99,13 @@ boxplot(res50[[1]],res50[[2]],names=c("OLS","varGuild"),ylab='MSE',main="p=50")
 
 
 ## Task
-## add the no gamma scenario
+## (1) add the follwing no gamma scenario with OLS MSE and make a table
+## Y= X %*% beta_real+ e  
+## Adjust beta_real and gamma_real and what we want: OLS MSE for above 0.05 vs OLS MSE for gamma simulation 0.2
+## (2) find the plot of grouped boxplot from Flashdata
+## plan
+## (1) lm() use fancy approaches for solve(t(X) %*% X) -- se Class 3 note in GLM --- Therefore, try to use lm() as possible as we can
+## eg. is beta_est the same as  lm(Y~., weight = W)
+## (2) calculate log-likehood goodness of fit test compared with OLS, if varGuid is not better we just give OLS solution
+## (3) like sandwich est but might not need for SE for varGuid --- in the future, we have to check the coverage of CI, is 95%?
+
