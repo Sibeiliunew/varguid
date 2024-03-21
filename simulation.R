@@ -107,5 +107,5 @@ boxplot(res50[[1]],res50[[2]],names=c("OLS","varGuild"),ylab='MSE',main="p=50")
 ## (1) lm() use fancy approaches for solve(t(X) %*% X) -- se Class 3 note in GLM --- Therefore, try to use lm() as possible as we can
 ## eg. is beta_est the same as  lm(Y~., weight = W)
 ## (2) calculate log-likehood goodness of fit test compared with OLS, if varGuid is not better we just give OLS solution
-## (3) like sandwich est but might not need for SE for varGuid --- in the future, we have to check the coverage of CI, is 95%?
+## (3) calculate SE or Var(beta_hat) like sandwich est but might not need for SE for varGuid, Class 6 note in GLM --- in the future, we have to check the coverage of CI, is 95%?
 
