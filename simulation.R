@@ -6,8 +6,8 @@ library(xtable)
 library(scales)
 
 
-n=100
-nsim=1000
+n=1000
+nsim=100
 
 
 dat_sim=function(n,beta_real,sig,gamma_real){
@@ -96,22 +96,24 @@ res50=sim_varguid(beta_real=rep(-1,p),gamma_real=rep(1,p),sig=1,nsim)
 
 
 par(mfrow = c(2, 2))
-boxplot(res5[[1]],res5[[2]],res5[[3]],ylim=c(0,1),
+boxplot(res5[[1]],res5[[2]],res5[[3]],ylim=c(0,0.05),
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=5")
-boxplot(res10[[1]],res10[[2]],res10[[3]],ylim=c(0,3),
+boxplot(res10[[1]],res10[[2]],res10[[3]],ylim=c(0,0.1),
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=10")
-boxplot(res20[[1]],res20[[2]],res20[[3]],ylim=c(0,50),
+boxplot(res20[[1]],res20[[2]],res20[[3]],ylim=c(0,2),
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=20")
-boxplot(res20[[1]],res50[[2]],res50[[3]],ylim=c(0,200),
+boxplot(res20[[1]],res50[[2]],res50[[3]],ylim=c(0,25),
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=50")
 #title("Rea")
-mtext("Real beta=-1, nsim=1000, n=100", side = 3, line = -2, outer = T)
+mtext("Real beta=-1, nsim=20, n=1000", side = 3, line = -2, outer = T)
 
 MSE_table=rbind(colMeans(as.data.frame(res5)),colMeans(as.data.frame(res10)),
                 colMeans(as.data.frame(res20)),colMeans(as.data.frame(res50)))
 
 rownames(MSE_table)=c("p=5","p=10","p=20","p=50")
 MSE_table
+
+
 
 ## Task
 ## (1) add the follwing no gamma scenario with OLS MSE and make a table
