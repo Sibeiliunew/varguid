@@ -6,8 +6,8 @@ AICf <- function(r, p){
 }
 
 
-beta_est=function(w, step = 1){
-  o <- lm(Y~.,data = data.frame(X,Y=Y), weights = exp(-step*w))
+beta_est=function(X, Y, w, step = 1){
+  o <- lm(outcome~.,data = data.frame(X=X,outcome=Y), weights = exp(-step*w))
   beta <- coef(o)
   if (length(unique(w))>1){
     p <- 2*(ncol(X))
@@ -15,8 +15,8 @@ beta_est=function(w, step = 1){
   AIC <- AICf(r = o$residuals, p)
   return(list(beta = beta, AIC = AIC))
 }
-w_est=function(beta){
-  o <- lm(Y~.,data = data.frame(X = X^2,Y = (Y-cbind(1,X)%*% beta )^2))
+w_est=function(X,Y,beta){
+  o <- lm(outcome~.,data = data.frame(X = X^2,outcome = (Y-cbind(1,X)%*% beta )^2))
   r <- o$fitted.values
   m <- max(r)[1]
   # gamma <- coef(o)
@@ -27,7 +27,7 @@ lmv <- function(X, Y, M =  100, step = 1, tol = exp(-10)){
 n <- length(Y)
 diff1 <- step
 
-o1 <- beta_est(w = rep(1,nrow(X)))
+o1 <- beta_est(X, Y, w = rep(1,nrow(X)))
 beta <- beta1 <- o1$beta
 AIC <- o1$AIC
 
@@ -36,8 +36,8 @@ for (i in 1:M) {
 
   old_beta <- beta
   old_AIC <- AIC
-  w <- w_est(beta)
-  o <- beta_est(w, step = step)
+  w <- w_est(X,Y,beta)
+  o <- beta_est(X, Y,w, step = step)
   if (diff1 > tol) {
     beta <- o$beta
     AIC <- o$AIC
