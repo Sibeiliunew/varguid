@@ -1,5 +1,5 @@
 
-source("/Volumes/Extreme SSD/heteroscedasticity/R code/varGuid.R")
+source("varGuid.R")
 n=1000
 p=5
 

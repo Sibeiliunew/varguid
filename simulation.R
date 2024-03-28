@@ -113,7 +113,7 @@ MSE_table=rbind(colMeans(as.data.frame(res5)),colMeans(as.data.frame(res10)),
 rownames(MSE_table)=c("p=5","p=10","p=20","p=50")
 MSE_table
 
-
+#### try p=1 to 9
 
 ## Task
 ## (1) add the follwing no gamma scenario with OLS MSE and make a table
