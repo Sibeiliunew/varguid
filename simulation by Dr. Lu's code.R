@@ -3,7 +3,7 @@ library("tidyverse")
 library(MASS)
 library(xtable)
 library(scales)
-source("VarGuid.R")
+source("VarGuid.0.2.R")
 
 n=1000
 nsim=500
@@ -57,7 +57,7 @@ boxplot(res20[[1]],res20[[2]],res20[[3]],
 boxplot(res20[[1]],res50[[2]],res50[[3]],
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=50")
 #title("Rea")
-mtext("Real beta=-1, nsim=500, n=1000", side = 3, line = -2, outer = T)
+mtext("Real beta=-1, nsim=200, n=1000", side = 3, line = -2, outer = T)
 
 MSE_table=rbind(colMeans(as.data.frame(res5)),colMeans(as.data.frame(res10)),
                 colMeans(as.data.frame(res20)),colMeans(as.data.frame(res50)))

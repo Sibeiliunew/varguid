@@ -1,6 +1,6 @@
 
-source("varGuid.R")
-n=1000
+source("/Volumes/Extreme SSD/heteroscedasticity/R code/varGuid.0.2.R")
+n=100
 p=5
 
 beta_real=rep(-1,p);sig =1;gamma_real=rep(1,p)
@@ -15,8 +15,10 @@ dat_sim=function(n,beta_real,sig,gamma_real){
 data <- dat_sim(n,beta_real, sig, gamma_real)
 X <- data[[1]]
 Y <- data[[2]]
+df <- data.frame(X, Y=Y)
 beta <- lmv(X, Y)
+
 ## not include intercept
 sum(abs(beta[-1]-beta_real))
-sum(abs(coef(lm(Y~.,data=data.frame(X, Y=Y)))[-1]-beta_real)) # the results from OLS
+sum(abs(coef(lm(Y~.,data=df))[-1]-beta_real)) # the results from OLS
 
