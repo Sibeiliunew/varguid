@@ -115,7 +115,7 @@ MSE_table
 
 #### try p=1 to 9
 
-## Task
+## 03/20 Task
 ## (1) add the follwing no gamma scenario with OLS MSE and make a table
 ## Y= X %*% beta_real+ e  
 ## Adjust beta_real and gamma_real and what we want: OLS MSE for above 0.05 vs OLS MSE for gamma simulation 0.2
@@ -125,4 +125,9 @@ MSE_table
 ## eg. is beta_est the same as  lm(Y~., weight = W)
 ## (2) calculate log-likehood goodness of fit test compared with OLS, if varGuid is not better we just give OLS solution
 ## (3) calculate SE or Var(beta_hat) like sandwich est but might not need for SE for varGuid, Class 6 note in GLM --- in the future, we have to check the coverage of CI, is 95%?
+
+## 03/29 Task
+## a) continue (3) from 03/20
+## b) note: introduction and simulation description
+## c) something to think about y_hat: is there anything else can make a difference on y_hat besides new beta_hat
 
