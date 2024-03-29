@@ -48,16 +48,16 @@ res50=sim_varguid(beta_real=rep(-1,p),gamma_real=rep(1,p),sig=1,nsim)
 
 
 par(mfrow = c(2, 2))
-boxplot(res5[[1]],res5[[2]],res5[[3]],
+boxplot(res5[[1]],res5[[2]],res5[[3]],ylim=c(0,0.1),
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=5")
-boxplot(res10[[1]],res10[[2]],res10[[3]],
+boxplot(res10[[1]],res10[[2]],res10[[3]],ylim=c(0,0.15),
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=10")
-boxplot(res20[[1]],res20[[2]],res20[[3]],
+boxplot(res20[[1]],res20[[2]],res20[[3]],ylim=c(0,0.2),
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=20")
-boxplot(res20[[1]],res50[[2]],res50[[3]],
+boxplot(res20[[1]],res50[[2]],res50[[3]],ylim=c(0,0.3),
         names=c("OLS in normal setting","OLS in gamma setting","varGuid"),ylab='MSE',main="p=50")
 #title("Rea")
-mtext("Real beta=-1, nsim=200, n=1000", side = 3, line = -2, outer = T)
+mtext("Real beta=-1, nsim=500, n=1000", side = 3, line = -2, outer = T)
 
 MSE_table=rbind(colMeans(as.data.frame(res5)),colMeans(as.data.frame(res10)),
                 colMeans(as.data.frame(res20)),colMeans(as.data.frame(res50)))
