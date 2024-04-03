@@ -29,7 +29,7 @@ sim_varguid=function(beta_real,gamma_real,sig=sig,nsim){
     m2=lm(Y~.,data=data.frame(X=sim[[1]],Y=sim[[2]])) # OLS in gamma setting
     MSE2[i]=mean((coef(m2)[-1]-beta_real)^2)
     
-    beta2=lmv(X=sim[[1]],Y=sim[[2]])
+    beta2=lmv(X=sim[[1]],Y=sim[[2]])$beta
     MSE3[i]=mean((beta2[-1]-beta_real)^2)
   }
   return(list(MSE1=MSE1,MSE2=MSE2,MSE3=MSE3))

@@ -49,9 +49,8 @@ for (i in 1:M) {
   diff1=sum((beta-old_beta)^2)
 
 }
-
-beta
-# Sibei not sure:se=sqrt(sum((Y-cbind(1,X)%*% beta )^2)/(n-p*2-1)*diag(solve(crossprod( X %*% w))))
+se=sqrt(sum((Y-cbind(1,X)%*% beta )^2)/(n-ncol(X)-1)*diag(solve(crossprod( diag(w) %*%cbind(1,X)))))
+return(list(beta=beta,se=se))
 }
 
 
