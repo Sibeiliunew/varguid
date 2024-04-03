@@ -51,6 +51,7 @@ for (i in 1:M) {
 }
 
 beta
+# Sibei not sure:se=sqrt(sum((Y-cbind(1,X)%*% beta )^2)/(n-p*2-1)*diag(solve(crossprod( X %*% w))))
 }
 
 

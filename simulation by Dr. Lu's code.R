@@ -3,7 +3,7 @@ library("tidyverse")
 library(MASS)
 library(xtable)
 library(scales)
-source("VarGuid.0.2.R")
+source("VarGuid.R")
 
 n=1000
 nsim=500
@@ -65,16 +65,6 @@ MSE_table=rbind(colMeans(as.data.frame(res5)),colMeans(as.data.frame(res10)),
 rownames(MSE_table)=c("p=5","p=10","p=20","p=50")
 MSE_table
 
-#### try p=1 to 9
+#########
 
-## Task
-## (1) add the follwing no gamma scenario with OLS MSE and make a table
-## Y= X %*% beta_real+ e  
-## Adjust beta_real and gamma_real and what we want: OLS MSE for above 0.05 vs OLS MSE for gamma simulation 0.2
-## (2) find the plot of grouped boxplot from Flashdata
-## plan
-## (1) lm() use fancy approaches for solve(t(X) %*% X) -- se Class 3 note in GLM --- Therefore, try to use lm() as possible as we can
-## eg. is beta_est the same as  lm(Y~., weight = W)
-## (2) calculate log-likehood goodness of fit test compared with OLS, if varGuid is not better we just give OLS solution
-## (3) calculate SE or Var(beta_hat) like sandwich est but might not need for SE for varGuid, Class 6 note in GLM --- in the future, we have to check the coverage of CI, is 95%?
 

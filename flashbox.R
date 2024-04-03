@@ -15,3 +15,6 @@ flash %>% select(CAT2,best_pre_fev1) %>% drop_na() %>%
   geom_boxplot() +
   theme_bw() +
   labs(x = 'CAT category by 8 unit')
+
+
+###### square residual vs predicted 
