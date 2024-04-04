@@ -16,7 +16,7 @@ beta_est=function(X, Y, w, step = 1){
   return(list(beta = beta, AIC = AIC, obj = o))
 }
 w_est=function(X,Y,beta){
-  o <- lm(Y~.,data = data.frame(X = X^2,Y = (Y-cbind(1,X)%*% beta )^2))
+  o <- lm(Y~.,data = data.frame(X = X^2,Y = (Y-apply(cbind(1,X),2,as.numeric)%*% beta )^2))
   r <- o$fitted.values
   m <- max(r)[1]
   # gamma <- coef(o)
@@ -51,8 +51,9 @@ for (i in 1:M) {
   diff1=sum((beta-old_beta)^2)
 
 }
-
-list(beta=beta, obj.OLS = obj.OLS, obj.varGuid = obj.varGuid)
+se=sqrt(sum((Y-apply(cbind(1,X),2,as.numeric)%*% beta )^2)/(n-ncol(X)-1)*diag(solve(crossprod( diag(w) %*%apply(cbind(1,X),2,as.numeric)))))
+list(beta=beta, obj.OLS = obj.OLS, obj.varGuid = obj.varGuid,se=se)
+#list(beta=beta, obj.OLS = obj.OLS, obj.varGuid = obj.varGuid)
 }
 
 
