@@ -3,7 +3,7 @@ library("tidyverse")
 library(MASS)
 library(xtable)
 library(scales)
-source("VarGuid.R")
+source("VarGuid20240403.R")
 
 n=1000
 nsim=500
@@ -29,7 +29,7 @@ sim_varguid=function(beta_real,gamma_real,sig=sig,nsim){
     m2=lm(Y~.,data=data.frame(X=sim[[1]],Y=sim[[2]])) # OLS in gamma setting
     MSE2[i]=mean((coef(m2)[-1]-beta_real)^2)
     
-    beta2=lmv(X=sim[[1]],Y=sim[[2]])$beta
+    beta2=lmv(X=sim[[1]],Y=sim[[2]])
     MSE3[i]=mean((beta2[-1]-beta_real)^2)
   }
   return(list(MSE1=MSE1,MSE2=MSE2,MSE3=MSE3))
@@ -65,6 +65,25 @@ MSE_table=rbind(colMeans(as.data.frame(res5)),colMeans(as.data.frame(res10)),
 rownames(MSE_table)=c("p=5","p=10","p=20","p=50")
 MSE_table
 
-#########
+######### for the se
+p=5;p2=5
+dat5=dat_sim(n,beta_real=rep(-1,p),sig = 1,gamma_real=rep(1,p)) 
+res5=lmv(dat5$X, dat5$Y)
+#summary(res5$obj.OLS)
+confint(res5$obj.OLS)
+confint(res5$obj.OLS)[,2]-confint(res5$obj.OLS)[,1]
+
+#summary(res5$obj.varGuid)
+confint(res5$obj.varGuid)
+confint(res5$obj.varGuid)[,2]-confint(res5$obj.varGuid)[,1]
+
+## calcualte the se by hand
+se=res5$se
+res5$beta-1.96*se
+res5$beta+1.96*se
+1.96*2*se
+
+
+
 
 
