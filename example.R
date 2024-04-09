@@ -1,5 +1,5 @@
 
-source("/Volumes/Extreme SSD/heteroscedasticity/R code/varGuid20240403.R")
+source("varGuid20240406.R")
 n=100
 p=5
 
@@ -20,8 +20,14 @@ o <- lmv(X, Y)
 beta <- o$beta
 summary(o$obj.OLS)
 confint(o$obj.OLS)
-o$obj.varGuid
-confint(o$obj.varGuid)
+for(i in 1:length(o$obj.varGuid.coef)){
+  print(names(o$obj.varGuid.coef)[i])
+  print(confint(o$obj.varGuid.coef[[i]]))
+}
+
+
+
+
 ## not include intercept
 sum(abs(beta[-1]-beta_real))
 sum(abs(coef(lm(Y~.,data=df))[-1]-beta_real)) # the results from OLS

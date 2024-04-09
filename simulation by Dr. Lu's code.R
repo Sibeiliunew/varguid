@@ -3,7 +3,7 @@ library("tidyverse")
 library(MASS)
 library(xtable)
 library(scales)
-source("VarGuid20240403.R")
+source("VarGuid20240406.R")
 
 n=1000
 nsim=500
@@ -65,80 +65,12 @@ MSE_table=rbind(colMeans(as.data.frame(res5)),colMeans(as.data.frame(res10)),
 rownames(MSE_table)=c("p=5","p=10","p=20","p=50")
 MSE_table
 
-######### for the se
-
-
-p=5;p2=5
-sim_5=beta_ci=NULL
-
-dat5=dat_sim(n,beta_real=c(-1,-0.5,0,0.5,1),sig = 1,gamma_real=rep(1,p))
-res5=lmv(dat5$X, dat5$Y)
-se=res5$se
-var2=t(rbind(res5$beta-1.96*se,res5$beta+1.96*se))
-for(d in 1:p){
-beta_ci[[d]]=rbind(confint(res5$obj.OLS)[d+1,],
-                   confint(res5$obj.varGuid)[d+1,],
-                   var2[d+1,])}
-
-sim_5[[1]]=dat5
-for (i in 2:nsim){
-dat5=dat_sim(n,beta_real=c(-1,-0.5,0,0.5,1),sig = 1,gamma_real=rep(1,p))
-res5=lmv(dat5$X, dat5$Y)
-se=res5$se
-var2=t(rbind(res5$beta-1.96*se,res5$beta+1.96*se))
-
-new=NULL
-for( d in 1:p){
-new[[d]]=rbind(confint(res5$obj.OLS)[d+1,],
-                   confint(res5$obj.varGuid)[d+1,],
-                   var2[d+1,])# the order: OLS, VAR,hand
-}
-# w: 1-5
-for (w in 1:p){
-beta_ci[[w]]=rbind(beta_ci[[w]],new[[w]])}
-
-sim_5[[i]]=dat5
-}
-
-##### 1
-
-beta1=as.data.frame(beta_ci[[1]]) %>% janitor::clean_names()
-
-beta1$type=rep(c("OLS","Varguid by lm func","Varguid by hand"),nsim)
-beta1$range=seq(from=-1.32, to=0.5,length.out=nrow(beta1))
-beta1$sim=factor(rep(1:nsim, each=3))
-beta1_use=beta1 %>% filter(type != "Varguid by hand")
-OLS=beta1_use %>% filter(type=="OLS")
-Var=beta1_use %>% filter(type=="Varguid by lm func")
-
-1-length(union(which(OLS$x2_5_percent >-1), which(OLS$x97_5_percent < -1)))/nsim
-1-length(union(which(Var$x2_5_percent >-1), which(Var$x97_5_percent < -1)))/nsim
-
-ggplot(data=beta1_use[1:30,],aes(x=sim,y=range))+theme_classic()+geom_linerange(position = position_dodge(width = 1),aes(ymin=x2_5_percent, ymax=x97_5_percent,x=sim,color=type))+
-  geom_hline(yintercept = -1,linetype="dashed")+labs(title = "Beta 1 CI in 15 simulations")+xlab("each simulation")
-
-########### 2
-
-beta5=as.data.frame(beta_ci[[5]]) %>% janitor::clean_names()
-
-beta5$type=rep(c("OLS","Varguid by lm func","Varguid by hand"),nsim)
-beta5$range=seq(from=0.7, to=1.3,length.out=nrow(beta4))
-beta5$sim=factor(rep(1:nsim, each=3))
-beta5_use=beta5 %>% filter(type != "Varguid by hand")
-
-OLS=beta5_use %>% filter(type=="OLS")
-Var=beta5_use %>% filter(type=="Varguid by lm func")
-
-1-length(union(which(OLS$x2_5_percent >1), which(OLS$x97_5_percent < 1)))/nsim
-1-length(union(which(Var$x2_5_percent >1), which(Var$x97_5_percent < 1)))/nsim
-
-ggplot(data=beta5_use[1:30,],aes(x=sim,y=range))+theme_classic()+geom_linerange(position = position_dodge(width = 1),aes(ymin=x2_5_percent, ymax=x97_5_percent,x=sim,color=type))+
-  geom_hline(yintercept = 1,linetype="dashed")+labs(title = "Beta 5 CI in 15 simulations")+xlab("each simulation")
 
 df=data.frame (
  Beta = c("beta1", "beta2", "beta3","beta4","beta5"),
-  OLS = c(0.894,0.902,0.882,0.904,0.91),
-  Varguid = c(0.908,0.92,0.906,0.92,0.928)
-) 
+  OLS = c(0.902,0.884,0.912,0.924,0.902),
+  Varguid = c(0.918,0.908,0.934,0.93,0.924)
+) %>% print()
 
+### get the bias 
 
