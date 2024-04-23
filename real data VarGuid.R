@@ -5,6 +5,9 @@ library(MASS)
 library(xtable)
 library(scales)
 library(caTools)
+library(readxl)
+library(openxlsx)
+library(mlbench)
 
 source("./VarGuid20240418.R")
 source("./leash2.2.R")
@@ -60,33 +63,50 @@ rmse <- rbind(rmse,sqrt(colMeans((matrix(rep(test.y,ncol(pred)),length(test.y))-
 ### test error
 rmse
 
-##### UCI data
-### 1. 
-real=readxl::read_xls("../concrete+compressive+strength/Concrete_Data.xls") %>% janitor::clean_names()
-
-sample <- sample.split(real$cement_component_1_kg_in_a_m_3_mixture, SplitRatio = 0.75)
-train  <- subset(real, sample == TRUE)
-test   <- subset(real, sample == FALSE)
-train.x=train[,1:8]
-train.y=unlist(train[,9])
-test.x=test[,1:8]
-test.y=unlist(test[,9])
 ####
 
-o=lmv(X=apply(train.x,2,as.numeric),Y=train.y)
 
-y.obj<- ymodv(o,gamma = c(seq(0,8.56, length.out=5)), phi = 0.45)
+##### UCI data
+### 1. concrete
+path=c("../concrete+compressive+strength/Concrete_Data.xls",
+       "../liver.xlsx",
+       "../Airfoil.xlsx",
+       "../Real estate valuation data set.xlsx",
+       "../mcs_ds_edited_iter_shuffled.csv")
 
-yhat.varGuid <- fnpred(mod=y.obj,
-                       lmvo = o,
-                       newdata = o$obj.varGuid$model[1:5,2:(ncol(o$obj.varGuid$model)-1)]) 
 
+knn = 10
+phi = 0.46
 
-### test error
-pred <- fnpred(mod=y.obj,lmvo = o,newdata = test.x)
 rmse <- c()
-rmse <- rbind(rmse,sqrt(colMeans((matrix(rep(test.y,ncol(pred)),length(test.y))-pred)^2)) )
-### test error
-rmse
+rmse_res=NULL
+
+for (d in 1:10){
+  real=read_excel(path[2]) %>% janitor::clean_names() 
+  
+  for (i in 1:3){
+  print(i) 
+  trn <- sample.split(1:nrow(real), SplitRatio = 0.75)
+  
+  train  <- subset(real, trn == TRUE)
+  test   <- subset(real, trn== FALSE)
+  
+  data=list(x.train = train[,1:(ncol(real)-1)],
+            y.train = train[,ncol(real)],
+            x.test = test[,1:(ncol(real)-1)],
+            y.test = test[,ncol(real)])
+  
+  o <- lmv(X = data$x.train, Y = unlist(data$y.train))
+  y.obj <- ymodv(o,gamma = c(seq(8,12.56, length.out=4)), phi = phi)
+  
+  
+  pred <- fnpred(mod=y.obj,lmvo = o,newdata = data$x.test)
+  
+  rmse <- rbind(rmse,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
+  }
+  rmse_res[[2]]=colMeans(as.data.frame(rmse))
+}
+
+
 
 
