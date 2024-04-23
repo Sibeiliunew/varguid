@@ -82,9 +82,9 @@ rmse <- c()
 rmse_res=NULL
 
 for (d in 1:10){
-  real=read_excel(path[2]) %>% janitor::clean_names() 
+  real=read_excel(path[i]) %>% janitor::clean_names() 
   
-  for (i in 1:3){
+  for (i in 1:5){
   print(i) 
   trn <- sample.split(1:nrow(real), SplitRatio = 0.75)
   
@@ -104,7 +104,7 @@ for (d in 1:10){
   
   rmse <- rbind(rmse,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
   }
-  rmse_res[[2]]=colMeans(as.data.frame(rmse))
+  rmse_res[[i]]=colMeans(as.data.frame(rmse))
 }
 
 
