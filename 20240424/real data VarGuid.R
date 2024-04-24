@@ -9,8 +9,8 @@ library(readxl)
 library(openxlsx)
 library(mlbench)
 
-source("./VarGuid20240418.R")
-source("./leash2.2.R")
+source("../VarGuid20240418.R")
+source("../leash2.3.R")
 
 
 flash <- readRDS("flash.rds")
@@ -75,16 +75,11 @@ path=c("./concrete+compressive+strength/Concrete_Data.xls",
        "./mcs_ds_edited_iter_shuffled.csv")
 
 
-knn = 10
-phi = 0.46
-
 rmse <- c()
 rmse_res=NULL
 
 for (d in 1:5){
-  if (d<5){
-  real=read_excel(path[4]) %>% janitor::clean_names(); real=real[,2:8] }else{
-  real=read_csv(path[5]) %>% janitor::clean_names();real=real[,1:5] }
+  real=read_excel(path[d]) %>% janitor::clean_names()
   for (i in 1:5){
   print(i) 
   trn <- sample.split(1:nrow(real), SplitRatio = 0.75)
@@ -98,16 +93,15 @@ for (d in 1:5){
             y.test = test[,ncol(real)])
   
   o <- lmv(X = data$x.train, Y = unlist(data$y.train))
-  y.obj <- ymodv(o,gamma = c(seq(8,12.56, length.out=4)), phi = phi,rf = FALSE)
+   y.obj <-ymodv(o,gamma = c(seq(0,9, length.out=5)), phi = 0.46, rf = FALSE)
   
   
   pred <- fnpred(mod=y.obj,lmvo = o,newdata = data$x.test)
   
   rmse <- rbind(rmse,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
   }
-  rmse_res[[4]]=colMeans(as.data.frame(rmse))
+  rmse_res[[d]]=colMeans(as.data.frame(rmse))
 }
 do.call("rbind",rmse_res)
-bind_rows(rmse_res, .id = "column_label")
 
 
