@@ -9,7 +9,7 @@ library(readxl)
 library(openxlsx)
 library(mlbench)
 
-source("./VarGuid20240418.R")
+source("./20240412/VarGuid20240412.R")
 source("./leash2.3.R")
 
 
@@ -77,7 +77,7 @@ path=c("./20240424/concrete+compressive+strength/Concrete_Data.xls",
 rmse <- c()
 rmse_res=NULL
 
-for (d in 2:5){
+for (d in 1:5){
   real=read_excel(path[d]) %>% janitor::clean_names()
   for (i in 1:5){
   print(i) 
