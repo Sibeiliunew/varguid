@@ -108,11 +108,13 @@ list(rmse = unlist(mlm),q = unlist(q), gamma = obj$gamma)
 # decide final model after optimizing gamma and phi
 ######################################################
 fnmod <- function(dat.x,dat.y,knn = 10, gamma = c(seq(0,8.56, length.out=5)), phi = 0.45, rf = TRUE)
-{  w <- rfobj <- NULL
+{  w <- NULL
+
+rfo0 <- rfgnr(formula = Y~.,data= data.frame(Y = as.vector(dat.y),
+                                             dat.x), proximity = rf)
+rfobj <- rfo0$obj
 if (rf == TRUE){
-  rfo0 <- rfgnr(formula = Y~.,data= data.frame(Y = as.vector(dat.y),
-                                     dat.x), proximity = TRUE)
-  rfobj <- rfo0$obj
+  
   w <- rfo0$w
   
 } 
@@ -138,7 +140,9 @@ list( clust = obj,
 rfgnr <- function(formula, data, proximity = TRUE){
  
   rfo <- rfsrc(formula,data= data,proximity = proximity ) 
+  if (proximity) {
   b <- exp(-rfo$proximity)
+  }
 
   list(obj = rfo,
        w = ifelse(proximity, c(t(b)[lower.tri(t(b), diag=FALSE)]), NA) )

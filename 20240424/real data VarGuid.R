@@ -9,8 +9,8 @@ library(readxl)
 library(openxlsx)
 library(mlbench)
 
-source("../VarGuid20240418.R")
-source("../leash2.3.R")
+source("./VarGuid20240418.R")
+source("./leash2.3.R")
 
 
 flash <- readRDS("flash.rds")
@@ -68,17 +68,16 @@ rmse
 
 ##### UCI data
 ### 1. concrete
-path=c("./concrete+compressive+strength/Concrete_Data.xls",
-       "./liver.xlsx",
-       "./Airfoil.xlsx",
-       "./Real estate valuation data set.xlsx",
-       "./mcs_ds_edited_iter_shuffled.csv")
-
+path=c("./20240424/concrete+compressive+strength/Concrete_Data.xls",
+       "./20240424/liver.xlsx",
+       "./20240424/Airfoil.xlsx",
+       "./20240424/Real estate valuation data set.xlsx",
+       "./20240424/mcs_ds_edited_iter_shuffled.xlsx")
 
 rmse <- c()
 rmse_res=NULL
 
-for (d in 1:5){
+for (d in 2:5){
   real=read_excel(path[d]) %>% janitor::clean_names()
   for (i in 1:5){
   print(i) 
