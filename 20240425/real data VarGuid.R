@@ -9,8 +9,8 @@ library(readxl)
 library(openxlsx)
 library(mlbench)
 
-source("./20240412/VarGuid20240412.R")
-source("./20240412/leash2.0.R")
+source("./20240425/VarGuid20240418.R")
+source("./20240425/leash2.0.1.R")
 
 
 flash <- readRDS("flash.rds")
@@ -49,7 +49,7 @@ test.y=test$cat_score
 
 o=lmv(X=apply(train.x,2,as.numeric),Y=train.y)
 
-y.obj<- ymodv(o,gamma = c(seq(0,9, length.out=5)), phi = 0.46)
+y.obj<- ymodv(o,gamma = c(seq(0,8.56, length.out=5)), phi = 0.45,rf = FALSE)
 
 yhat.varGuid <- fnpred(mod=y.obj,
                        lmvo = o,
@@ -72,32 +72,34 @@ path=c("./20240424/concrete+compressive+strength/Concrete_Data.xls",
        "./20240424/liver.xlsx",
        "./20240424/Airfoil.xlsx",
        "./20240424/Real estate valuation data set.xlsx",
-       "./20240424/mcs_ds_edited_iter_shuffled.xlsx")
-flash <- readRDS("flash.rds")
-real=data.frame(MSV_exp= flash$MSV_exp,MSV_insp=flash$MSV_insp,VH_exp= flash$VH_exp,VH_insp=flash$VH_insp,
-               VDP_exp= flash$VDP_exp, VDP_insp=flash$VDP_insp, TV_exp= flash$TV_exp, TV_insp=flash$TV_insp,FEV1=flash$best_pre_fev1,
-               age=flash$age,bmi=flash$bmi_new,cat_score=flash$cat_score
-) %>% drop_na()
+       "./20240424/mcs_ds_edited_iter_shuffled.xlsx",
+       "./20240424/auto.xlsx",
+      # "./20240424/fb.xlsx",
+       "./20240424/slump_final.xlsx",
+       "./20240424/chem.xlsx",
+      "./20240424/sevo.xlsx",
+      "./20240424/for.xlsx")
 
 rmse <- c()
 rmse_res=NULL
 
-for (d in 1:5){
-  real=read_excel(path[d]) %>% janitor::clean_names()
-  for (i in 1:5){
+for (d in 1:length(path)){
+  real= read_excel(path[d]) %>% janitor::clean_names() 
+  real = na.omit(real)
+  for (i in 1:10){
   print(i) 
   trn <- sample.split(1:nrow(real), SplitRatio = 0.75)
   
   train  <- subset(real, trn == TRUE)
   test   <- subset(real, trn== FALSE)
   
-  data=list(x.train = train[,1:(ncol(real)-1)],
+  data=list(x.train = makeX(train[,1:(ncol(real)-1)]),
             y.train = train[,ncol(real)],
-            x.test = test[,1:(ncol(real)-1)],
+            x.test = makeX(test[,1:(ncol(real)-1)]),
             y.test = test[,ncol(real)])
   
-  o <- lmv(X = data$x.train, Y = unlist(data$y.train))
-   y.obj <-ymodv(o,gamma = c(seq(0,9, length.out=5)), phi = 0.46)
+  o <- lmv(X =as.matrix(data$x.train) , Y = unlist(data$y.train), lasso = FALSE) # , lasso = TRUE
+   y.obj <-ymodv(o,gamma = c(seq(0,9, length.out=5)), phi = 0.46)#, rf = FALSE)
   
   
   pred <- fnpred(mod=y.obj,lmvo = o,newdata = data$x.test)
@@ -106,6 +108,6 @@ for (d in 1:5){
   }
   rmse_res[[d]]=colMeans(as.data.frame(rmse))
 }
-do.call("rbind",rmse_res)
+table1=do.call("rbind",rmse_res)
 
-
+save(rmse_res, file = "rmse_resMin18Leash2.0.RData")
