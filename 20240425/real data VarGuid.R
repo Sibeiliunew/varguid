@@ -8,9 +8,13 @@ library(caTools)
 library(readxl)
 library(openxlsx)
 library(mlbench)
+library("caret")
+library("e1071")
+library(knitr)
+options(digits=4)
 
-source("./20240425/VarGuid20240418.R")
-source("./20240425/leash2.0.1.R")
+source("./20240425/VarGuid20240502.R")
+source("./20240425/leash2.0.2.R")
 
 
 flash <- readRDS("flash.rds")
@@ -73,12 +77,12 @@ path=c("./20240424/concrete+compressive+strength/Concrete_Data.xls",
        "./20240424/Airfoil.xlsx",
        "./20240424/Real estate valuation data set.xlsx",
        "./20240424/mcs_ds_edited_iter_shuffled.xlsx",
-       "./20240424/auto.xlsx",
-      # "./20240424/fb.xlsx",
+       "./20240424/auto.xlsx", 
        "./20240424/slump_final.xlsx",
        "./20240424/chem.xlsx",
-      "./20240424/sevo.xlsx",
-      "./20240424/for.xlsx")
+      #"./20240424/sevo.xlsx",
+      "./20240424/for.xlsx",
+      "./20240424/fb.xlsx")
 
 rmse <- c()
 rmse_res=NULL
@@ -86,16 +90,18 @@ rmse_res=NULL
 for (d in 1:length(path)){
   real= read_excel(path[d]) %>% janitor::clean_names() 
   real = na.omit(real)
+  real <- cbind(makeX(real[,1:(ncol(real)-1)]), real[,ncol(real)])
+  folds=createFolds(1:nrow(real), k = 10) ## 10 cv
   for (i in 1:10){
   print(i) 
-  trn <- sample.split(1:nrow(real), SplitRatio = 0.75)
+  #trn <- sample.split(1:nrow(real), SplitRatio = 0.75)
   
-  train  <- subset(real, trn == TRUE)
-  test   <- subset(real, trn== FALSE)
+  train  <- real[-folds[[i]],]
+  test   <- real[folds[[i]],]
   
-  data=list(x.train = makeX(train[,1:(ncol(real)-1)]),
+  data=list(x.train = train[,1:(ncol(real)-1)],
             y.train = train[,ncol(real)],
-            x.test = makeX(test[,1:(ncol(real)-1)]),
+            x.test = test[,1:(ncol(real)-1)],
             y.test = test[,ncol(real)])
   
   o <- lmv(X =as.matrix(data$x.train) , Y = unlist(data$y.train), lasso = FALSE) # , lasso = TRUE
@@ -109,5 +115,5 @@ for (d in 1:length(path)){
   rmse_res[[d]]=colMeans(as.data.frame(rmse))
 }
 table1=do.call("rbind",rmse_res)
-
-save(rmse_res, file = "rmse_resMin18Leash2.0.RData")
+table1
+save(table1, file = "rmse_resMin18Leash2.0.RData")
