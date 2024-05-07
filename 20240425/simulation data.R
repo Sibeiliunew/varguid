@@ -1,6 +1,7 @@
 source("./20240425/simulation/generate_function_simulation.R")
 source("./20240425/leash2.0.2.R")
-source("./20240425/leash2.0.2.R")
+library(glmnet)
+library(tidyverse)
 ####################################################################
 ###   
 ###  Simulation data: simulate 10 datasets from the generate_function_simulation.R
@@ -24,11 +25,11 @@ simnames <- c("cobra2",    "cobra8",    "friedman1", "friedman3", "inx1",
 ## another way
 #simo <- simulation.sum[[simnames[i]]](n=n, d=d, corrv = corrv)$dta
 
-rmse5 <- c()
-rmse_res5=NULL
+rmse3 <- c()
+rmse_res3=NULL
 
 for (c in 1:10){
-  for( i in 1:10){
+  for( i in 1:50){
   print(i)
   simo <- simulation.sum[[simnames[c]]](n=n, d=d, corrv = corrv)$dta
   trn <- sample.split(1:n, SplitRatio = 0.75)
@@ -46,24 +47,24 @@ for (c in 1:10){
   
   pred <- fnpred(mod=y.obj,lmvo = o,newdata = data$x.test)
   
-  rmse5 <- rbind(rmse,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
+  rmse3 <- rbind(rmse,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
   }
-  rmse_res5[[c]]=colMeans(as.data.frame(rmse5))
+  rmse_res3[[c]]=colMeans(as.data.frame(rmse3))
 }
 
-table5=do.call("rbind",rmse_res5)
-table5
+table3=do.call("rbind",rmse_res3)
+table3
 
 ##### larger p
 
 n <- 100
 d <- 200
-corrv <- c(0, .9)[2]
-rmse6 <- c()
-rmse_res6=NULL
+#corrv <- c(0, .9)[2]
+rmse4 <- c()
+rmse_res4=NULL
 
 for (c in 1:10){
-  for( i in 1:10){
+  for( i in 1:50){
     print(i)
     simo <- simulation.sum[[simnames[c]]](n=n, d=d, corrv = corrv)$dta
     trn <- sample.split(1:n, SplitRatio = 0.75)
@@ -80,34 +81,47 @@ for (c in 1:10){
     
     pred <- fnpred(mod=y.obj,lmvo = o,newdata = data$x.test)
     
-    rmse6 <- rbind(rmse,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
+    rmse4 <- rbind(rmse,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
   }
-  rmse_res6[[c]]=colMeans(as.data.frame(rmse6))
+  rmse_res4[[c]]=colMeans(as.data.frame(rmse4))
 }
 
-table6=do.call("rbind",rmse_res6)
-table6
+table4=do.call("rbind",rmse_res4)
+table4
 
 
 #### for larger p real data
 #####
 
-library(datamicroarray)
-data('subramanian', package = 'datamicroarray')
-dat=subramanian
+library("datamicroarray")
+data.names <- c("alon","christensen","gravier","pomeroy","shipp", "singh","tian", "west" ,"gordon","subramanian")
+
 
 ## use lasso to find the outcome: the continuous outcome will be the most important gene for 
 ## predicting the classification outcome
 
 library(glmnet)
-#summary(dat$x[,1:10])
-dat$x <- scale(dat$x)
-dat$x <- makeX(as.data.frame(dat$x))
-cv_model <- cv.glmnet(dat$x,dat$y , family = "binomial") # binomial
+for (i in 3:length(data.names)){
+nm <- data.names[i]
+data(list=nm, package = 'datamicroarray')
+x <- eval(parse(text=nm))$x
+y <- eval(parse(text=nm))$y
+
+#dat=cbind(x,y) %>%as.data.frame() %>%  filter(y != "placenta") %>% mutate(y=factor(y,levels=c("blood","other")))
+#x=dat[,1:(ncol(dat)-1)]
+#y=dat[,ncol(dat)]
+
+x <- scale(x)
+x <- makeX(as.data.frame(x))
+cv_model <- cv.glmnet(x,y , family = "binomial") # binomial
 
 best_lambda <- cv_model$lambda.min
-o <- glmnet(dat$x,dat$y , alpha = 1, lambda = best_lambda, family = "binomial")
+#print(best_lambda)
+o <- glmnet(x,y , alpha = 1, lambda = best_lambda, family = "binomial")
 yindex <- which.max(abs(as.vector(o$beta)))
+
+print(colnames(x)[yindex])
+}
 
 c=10
 realDat[[c]] <- data.frame(y = dat$x[,yindex ],dat$x[,-yindex ])
