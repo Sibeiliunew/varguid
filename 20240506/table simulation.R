@@ -14,18 +14,19 @@ library(olsrr)
 nsim <- 1000
 
 dat_sim=function(n,p,beta_real,gamma_real,corrv){
-  if ( ! is.null(gamma_real)){
+  
     X <- as.matrix(rnorm_multi(n = n, 
                      mu = rep(0,p),
                      sd = rep(1,p),
                      r = corrv, 
                      varnames = letters[1:p],
                      empirical = FALSE))
-     e=rnorm(n,sd = 1)                            
+     e=rnorm(n,sd = 1)     
+     if ( ! is.null(gamma_real)){
      Y= as.matrix(X) %*% beta_real+ X %*% gamma_real *e  
-     Y2= as.matrix(X) %*% beta_real+ e 
+     
      return(list(X=X, Y=Y))}
-  else{
+  else{ Y2= as.matrix(X) %*% beta_real+ e 
         return(list(X=X,Y=Y2))
   }
 }
@@ -168,7 +169,7 @@ apply(sce5_4$heter_test,2,function(x) length(which(x<0.05))/nsim )
 sce1_1=sim_varguid(n=20,p=1,beta_real=1,
                    gamma_real=1,corrv=0,name="sce1") 
 
-apply(sce5_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
+apply(sce1_1$heter_test,2,function(x) length(which(x<0.05))/nsim )
 
 sce1_3=sim_varguid(n=200,p=1,beta_real=1,
                    gamma_real=1,corrv=0,name="sce1") 
@@ -184,8 +185,6 @@ apply(sce1_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
 sce3_1=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
                    gamma_real=NULL,corrv=0,name="sce3") 
 
-
-
 apply(sce3_1$heter_test,2,function(x) length(which(x<0.05))/nsim )
 
 #######
@@ -196,7 +195,7 @@ apply(sce3_2$heter_test,2,function(x) length(which(x<0.05))/nsim )
 
 
 ######
-sce3_3=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+sce3_3=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
                    gamma_real=NULL,corrv=0,name="sce3") 
 
 
@@ -204,7 +203,7 @@ sce3_3=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
 apply(sce3_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
 
 #######
-sce3_4=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+sce3_4=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
                    gamma_real=NULL,corrv=0.9,name="sce3") 
 
 apply(sce3_4$heter_test,2,function(x) length(which(x<0.05))/nsim )
