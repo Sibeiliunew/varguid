@@ -14,6 +14,7 @@ library(olsrr)
 nsim <- 1000
 
 dat_sim=function(n,p,beta_real,gamma_real,corrv){
+  if ( ! is.null(gamma_real)){
     X <- as.matrix(rnorm_multi(n = n, 
                      mu = rep(0,p),
                      sd = rep(1,p),
@@ -22,45 +23,188 @@ dat_sim=function(n,p,beta_real,gamma_real,corrv){
                      empirical = FALSE))
      e=rnorm(n,sd = 1)                            
      Y= as.matrix(X) %*% beta_real+ X %*% gamma_real *e  
-     return(list(X=X, Y=Y))
+     Y2= as.matrix(X) %*% beta_real+ e 
+     return(list(X=X, Y=Y))}
+  else{
+        return(list(X=X,Y=Y2))
+  }
 }
 
-sim_varguid=function(n,p,beta_real,gamma_real,corrv){
-  SE1=SE2=vector(mode='list', p)
+sim_varguid=function(n,p,beta_real,gamma_real,corrv,name){
+  beta_var=beta_ols=vector(mode='list', p)
   dat=vector(mode='list', nsim)
+  heter_test=NULL
   for (i in 1:nsim) {
     sim=dat_sim(n,p,beta_real,gamma_real,corrv)
+    
     dat[[i]]=cbind(sim[[1]],sim[[2]])
     
     m2=lm(Y~.,data=data.frame(X=sim[[1]],Y=sim[[2]])) # OLS 
-    ols_test_breusch_pagan(m2)
-    holder=(coef(m2)[-1]-beta_real)^2
+    heter_test_holder=c(ols_test_breusch_pagan(m2)$p,ols_test_score(m2)$p,ols_test_f(m2)$p)
+    heter_test=rbind(heter_test,heter_test_holder)
+    holder=coef(m2)[-1]
     
     beta2=lmv(X=sim[[1]],Y=sim[[2]])$beta
-    holder2=(beta2[-1]-beta_real)^2
+    holder2=beta2[-1]
     
-    for(d in 1:p){
-      SE1[[d]]=c(SE1[[d]],holder[d])
-      SE2[[d]]=c(SE2[[d]],holder2[d])
-    }
+     for(d in 1:p){
+      beta_ols[[d]]=c(beta_ols[[d]],holder[d])
+      beta_var[[d]]=c(beta_var[[d]],holder2[d])
+     }
     
   }
-  saveRDS(dat,paste(eval(parse(text=n)),"with",eval(parse(text=p)),"with",eval(parse(text=corrv)),".rds",sep=""))
+  saveRDS(dat,paste(eval(name),"_",eval(parse(text=n)),"with",eval(parse(text=p)),"with",eval(parse(text=corrv)),".rds",sep=""))
   
-  SE1=as.data.frame(do.call(cbind,SE1))
-  SE2=as.data.frame(do.call(cbind,SE2))
-  SE1$type=rep("OLS",nrow(SE1))
-  SE2$type=rep("Varguid",nrow(SE2))
-  res=rbind(SE1,SE2)
-  return(res=res)
+  beta_ols=as.data.frame(do.call(cbind,beta_ols))
+  beta_var=as.data.frame(do.call(cbind,beta_var))
+  beta_ols$type=rep("OLS",nrow(beta_ols))
+  beta_var$type=rep("Varguid",nrow(beta_var))
+  res=rbind(beta_ols,beta_var)
+  colnames(heter_test)=c("Breusch Pagan","Score test","F test")
+  return(list(res=res,heter_test=heter_test))
 }
 
+#######################################################
+##########
+##########scenario2
+#########################################################
+
 ## n=20 ,p=10, cor=0
-n=20;p=10
-beta_real=c(rep(1,5),rep(0,5))
-gamma_real=c(rep(1,5),rep(0,5))
-corrv <- 0
 
-sce2_1=sim_varguid(n,p,beta_real,gamma_real,corrv) # n=20 ,p=10, cor=0
+sce2_1=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0) 
 
 
+
+apply(sce2_1$heter_test,2,function(x) length(which(x<0.05))/nsim )
+## n=20 ,p=10, cor=0.9
+sce2_2=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0.9) 
+
+apply(sce2_2$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+### n=200, p=10, cov=0
+sce2_3=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0) 
+
+apply(sce2_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+### n=200, p=10, cov=0.9
+sce2_4=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0.9) 
+
+apply(sce2_4$heter_test,2,function(x)length(which(x<0.05))/nsim )
+
+#######################################################
+##########
+##########scenario4
+#########################################################
+
+sce4_1=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=c(rep(0,5),rep(1,5)),corrv=0,name="sce4") 
+
+
+
+apply(sce4_1$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+#######
+sce4_2=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=c(rep(0,5),rep(1,5)),corrv=0.9,name="sce4") 
+
+
+
+apply(sce4_2$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+#####
+sce4_3=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=c(rep(0,5),rep(1,5)),corrv=0,name="sce4") 
+
+
+
+apply(sce4_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+#######
+sce4_4=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=c(rep(0,5),rep(1,5)),corrv=0.9,name="sce4") 
+
+apply(sce4_4$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+
+#######################################################
+##########
+##########scenario5 p=15
+#########################################################
+
+sce5_1=sim_varguid(n=20,p=15,beta_real=c(rep(1,5),rep(0,10)),
+                   gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0,name="sce5") 
+
+apply(sce5_1$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+#####
+sce5_2=sim_varguid(n=20,p=15,beta_real=c(rep(1,5),rep(0,10)),
+                   gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0.9,name="sce5") 
+
+apply(sce5_2$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+#####
+sce5_3=sim_varguid(n=200,p=15,beta_real=c(rep(1,5),rep(0,10)),
+                   gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0,name="sce5") 
+
+apply(sce5_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+#####
+
+sce5_4=sim_varguid(n=200,p=15,beta_real=c(rep(1,5),rep(0,10)),
+                   gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0.9,name="sce5") 
+
+apply(sce5_4$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+
+
+########################################################
+########## sce1
+####################################################
+
+sce1_1=sim_varguid(n=20,p=1,beta_real=1,
+                   gamma_real=1,corrv=0,name="sce1") 
+
+apply(sce5_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+sce1_3=sim_varguid(n=200,p=1,beta_real=1,
+                   gamma_real=1,corrv=0,name="sce1") 
+
+apply(sce1_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+
+########################################################
+########## sce3
+####################################################
+
+#####
+sce3_1=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=NULL,corrv=0,name="sce3") 
+
+
+
+apply(sce3_1$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+#######
+sce3_2=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=NULL,corrv=0.9,name="sce3") 
+
+apply(sce3_2$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+
+######
+sce3_3=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=NULL,corrv=0,name="sce3") 
+
+
+
+apply(sce3_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+#######
+sce3_4=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
+                   gamma_real=NULL,corrv=0.9,name="sce3") 
+
+apply(sce3_4$heter_test,2,function(x) length(which(x<0.05))/nsim )
