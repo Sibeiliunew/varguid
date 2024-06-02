@@ -10,7 +10,6 @@ library(faux)
 library(olsrr)
 
 
-
 nsim <- 1000
 
 dat_sim=function(n,p,beta_real,gamma_real,corrv){
@@ -23,7 +22,7 @@ dat_sim=function(n,p,beta_real,gamma_real,corrv){
                      empirical = FALSE))
      e=rnorm(n,sd = 1)     
      if ( ! is.null(gamma_real)){
-     Y= as.matrix(X) %*% beta_real+ X %*% gamma_real *e  
+     Y= as.matrix(X) %*% beta_real+ (1+X %*% gamma_real) *e  
      
      return(list(X=X, Y=Y))}
   else{ Y2= as.matrix(X) %*% beta_real+ e 
@@ -34,15 +33,18 @@ dat_sim=function(n,p,beta_real,gamma_real,corrv){
 sim_varguid=function(n,p,beta_real,gamma_real,corrv,name){
   beta_var=beta_ols=vector(mode='list', p)
   dat=vector(mode='list', nsim)
-  heter_test=NULL
+  heter_test_p=NULL
+  heter_test_sta=NULL
   for (i in 1:nsim) {
     sim=dat_sim(n,p,beta_real,gamma_real,corrv)
     
     dat[[i]]=cbind(sim[[1]],sim[[2]])
     
     m2=lm(Y~.,data=data.frame(X=sim[[1]],Y=sim[[2]])) # OLS 
-    heter_test_holder=c(ols_test_breusch_pagan(m2)$p,ols_test_score(m2)$p,ols_test_f(m2)$p)
-    heter_test=rbind(heter_test,heter_test_holder)
+    heter_test_holder_p=c(ols_test_breusch_pagan(m2)$p,ols_test_score(m2)$p,ols_test_f(m2)$p)
+    heter_test_holder_sta=c(ols_test_breusch_pagan(m2)$bp,ols_test_score(m2)$score,ols_test_f(m2)$f)
+    heter_test_p=rbind(heter_test_p,heter_test_holder_p)
+    heter_test_sta=rbind(heter_test_sta,heter_test_holder_sta)
     holder=coef(m2)[-1]
     
     beta2=lmv(X=sim[[1]],Y=sim[[2]])$beta
@@ -61,8 +63,9 @@ sim_varguid=function(n,p,beta_real,gamma_real,corrv,name){
   beta_ols$type=rep("OLS",nrow(beta_ols))
   beta_var$type=rep("Varguid",nrow(beta_var))
   res=rbind(beta_ols,beta_var)
-  colnames(heter_test)=c("Breusch Pagan","Score test","F test")
-  return(list(res=res,heter_test=heter_test))
+  colnames(heter_test_p)=c("Breusch Pagan","Score test","F test")
+  colnames(heter_test_sta)=c("Breusch Pagan","Score test","F test")
+  return(list(res=res,heter_test_p=heter_test_p,heter_test_sta=heter_test_sta))
 }
 
 #######################################################
@@ -73,29 +76,29 @@ sim_varguid=function(n,p,beta_real,gamma_real,corrv,name){
 ## n=20 ,p=10, cor=0
 
 sce2_1=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
-                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0) 
+                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0,name="sce2") 
 
+apply(sce2_1$heter_test_p,2,function(x) length(which(x<0.05))/nsim )
+apply(sce2_1$heter_test_sta,2,mean )
 
-
-apply(sce2_1$heter_test,2,function(x) length(which(x<0.05))/nsim )
 ## n=20 ,p=10, cor=0.9
 sce2_2=sim_varguid(n=20,p=10,beta_real=c(rep(1,5),rep(0,5)),
-                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0.9) 
+                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0.9,name="sce2") 
 
 apply(sce2_2$heter_test,2,function(x) length(which(x<0.05))/nsim )
-
+apply(sce2_2$heter_test_sta,2,mean )
 ### n=200, p=10, cov=0
 sce2_3=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
-                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0) 
+                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0,name="sce2") 
 
 apply(sce2_3$heter_test,2,function(x) length(which(x<0.05))/nsim )
-
+apply(sce2_3$heter_test_sta,2,mean )
 ### n=200, p=10, cov=0.9
 sce2_4=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
-                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0.9) 
+                   gamma_real=c(rep(1,5),rep(0,5)),corrv=0.9,name="sce2") 
 
 apply(sce2_4$heter_test,2,function(x)length(which(x<0.05))/nsim )
-
+apply(sce2_4$heter_test_sta,2,mean )
 #######################################################
 ##########
 ##########scenario4
@@ -207,3 +210,5 @@ sce3_4=sim_varguid(n=200,p=10,beta_real=c(rep(1,5),rep(0,5)),
                    gamma_real=NULL,corrv=0.9,name="sce3") 
 
 apply(sce3_4$heter_test,2,function(x) length(which(x<0.05))/nsim )
+
+
