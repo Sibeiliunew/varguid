@@ -18,7 +18,7 @@ dat_sim=function(n,p,beta_real,gamma_real,corrv){
                      mu = rep(0,p),
                      sd = rep(1,p),
                      r = corrv, 
-                     varnames = letters[1:p],
+                     #varnames = letters[1:p],
                      empirical = FALSE))
      e=rnorm(n,sd = 1)     
      if ( ! is.null(gamma_real)){
