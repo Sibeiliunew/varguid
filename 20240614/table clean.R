@@ -411,7 +411,9 @@ yhat=function(dat,test,lasso_status){
               y.test = test[[2]])
     
     o <- lmv(X =as.matrix(data$x.train) , Y = unlist(data$y.train), lasso = lasso_status) # , lasso = TRUE
-    y.obj <-ymodv(o,gamma = c(seq(0,9, length.out=5)), phi = 0.46)#, rf = FALSE)
+       y.obj <-   tryCatch({
+      ymodv(o,gamma = c(seq(0,9, length.out=4)), phi = 0.46)#, rf = FALSE)
+       }, error=function(e){}) 
     
     pred <- fnpred(mod=y.obj,lmvo = o,newdata = data$x.test)
     
