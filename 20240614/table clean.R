@@ -401,7 +401,7 @@ ci_organize(dat,beta_real=c(rep(1,5),rep(0,5)))
 yhat=function(dat,test,lasso_status){
   rmse3 <- c()
   rmse_res3=NULL
-  for( i in 1:nsim){ 
+  for( i in 1:300){ 
     dat_sub=as.data.frame(dat[[i]])
     same_name=colnames(test[[1]])
     colnames(dat_sub[,1:(ncol(dat_sub)-1)])=same_name
@@ -486,7 +486,7 @@ dat <- readRDS("./20240601 simulated data/sce5_20with15with0.9.rds")
 test_sce5_20with15with0.9=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
                                    beta_real=c(rep(1,5),rep(0,10)),
                                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0.9)
-saveRDS(test_sce5_20with15with0.9,"test_sce5_20with15with0.9.rds")
+#saveRDS(test_sce5_20with15with0.9,"test_sce5_20with15with0.9.rds")
 
 yhat(dat = dat,test=test_sce5_20with15with0.9,lasso_status=FALSE)
 
@@ -497,7 +497,7 @@ dat <- readRDS("./20240601 simulated data/sce5_200with15with0.rds")
 test_sce5_200with15with0=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,10)),
              gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0)
-saveRDS(test_sce5_200with15with0,"test_sce5_200with15with0.rds")
+#saveRDS(test_sce5_200with15with0,"test_sce5_200with15with0.rds")
 yhat(dat = dat,test=test_sce5_200with15with0,lasso_status=FALSE)
 
 
@@ -506,5 +506,5 @@ test_sce5_200with15with0.9=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,10)),
              gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0.9)
 
-saveRDS(test_sce5_200with15with0.9,"test_sce5_200with15with0.9.rds")
+#saveRDS(test_sce5_200with15with0.9,"test_sce5_200with15with0.9.rds")
 yhat(dat = dat,test=test_sce5_200with15with0.9,lasso_status=FALSE)

@@ -21,7 +21,7 @@ yhat(dat = readRDS("./sce6_200with20with0.9.rds"),test=dat_sim(n=20,p=20,
                                                                gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,10)),corrv=0.9),lasso_status=TRUE)
 #############################################
 #############################################
-yhat(dat = readRDS("./sce7_20with100with0.rds"),test=dat_sim(n=20,p=100,
+yhat(dat = readRDS("../varguid data/sce7_20with100with0.rds"),test=dat_sim(n=20,p=100,
                                                             beta_real=c(rep(1,5),rep(0,95)),
                                                             gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,90)),corrv=0),lasso_status=TRUE)
 yhat(dat = readRDS("./sce7_20with100with0.9.rds"),test=dat_sim(n=20,p=100,
