@@ -1,6 +1,6 @@
 #source("./20240425/simulation/generate_function_simulation.R")
-source("./20240425/leash2.0.2.R")
-source("./20240425/VarGuid20240502.R")
+source("./leash2.0.5.R")
+source("./VarGuid20240617.R")
 library(glmnet)
 library(tidyverse)
 library(MASS)
@@ -57,8 +57,6 @@ sim_varguid=function(n,p,beta_real,gamma_real,corrv,name){
       beta_var[[d]]=c(beta_var[[d]],holder2[d])
      }
     
-    
-    
   }
   saveRDS(dat,paste(eval(name),"_",eval(parse(text=n)),"with",eval(parse(text=p)),"with",eval(parse(text=corrv)),".rds",sep=""))
   
@@ -70,9 +68,7 @@ sim_varguid=function(n,p,beta_real,gamma_real,corrv,name){
   colnames(heter_test_p)=c("Breusch Pagan","Score test","F test")
   colnames(heter_test_sta)=c("Breusch Pagan","Score test","F test")
   
-  
-  
-  
+
   return(list(res=res,heter_test_p=heter_test_p,heter_test_sta=heter_test_sta))
 }
 

@@ -1,6 +1,6 @@
 source("./20240425/simulation/generate_function_simulation.R")
-source("./20240425/leash2.0.2.R")
-source("./20240425/VarGuid20240502.R")
+source("./leash2.0.5.R")
+source("./VarGuid20240617.R")
 library(glmnet)
 library(tidyverse)
 library(MASS)
@@ -401,7 +401,7 @@ ci_organize(dat,beta_real=c(rep(1,5),rep(0,5)))
 yhat=function(dat,test,lasso_status){
   rmse3 <- c()
   rmse_res3=NULL
-  for( i in 1:300){ 
+  for( i in 1:nsim){ 
     dat_sub=as.data.frame(dat[[i]])
     same_name=colnames(test[[1]])
     colnames(dat_sub[,1:(ncol(dat_sub)-1)])=same_name
@@ -410,10 +410,13 @@ yhat=function(dat,test,lasso_status){
               x.test = makeX(as.data.frame(test[[1]])),
               y.test = test[[2]])
     
+    colnames(data$x.train) <- colnames(data$x.test)
+    
     o <- lmv(X =as.matrix(data$x.train) , Y = unlist(data$y.train), lasso = lasso_status) # , lasso = TRUE
-       y.obj <-   tryCatch({
+    
+    y.obj <-   tryCatch({
       ymodv(o,gamma = c(seq(0,9, length.out=4)), phi = 0.46)#, rf = FALSE)
-       }, error=function(e){}) 
+    }, error=function(e){cat("error happens",i,"run")}) 
     
     pred <- fnpred(mod=y.obj,lmvo = o,newdata = data$x.test)
     
