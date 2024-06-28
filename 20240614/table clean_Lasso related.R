@@ -51,23 +51,23 @@ yhat(dat = readRDS("../varguid data/sce8_200with200with0.9.rds"),test=dat_sim(n=
 #############################################
 #############################################
 
-# yhat(dat = readRDS("./sce9_20with400with0.rds"),test=dat_sim(n=20,p=400,
-#                                                              beta_real=c(rep(1,5),rep(0,395)),
-#                                                              gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0),lasso_status=TRUE)
-# yhat(dat = readRDS("./sce9_20with400with0.9.rds"),test=dat_sim(n=20,p=400,
-#                                                                beta_real=c(rep(1,5),rep(0,395)),
-#                                                                gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0.9),lasso_status=TRUE)
-# yhat(dat = readRDS("./sce9_200with400with0.rds"),test=dat_sim(n=20,p=400,
-#                                                               beta_real=c(rep(1,5),rep(0,395)),
-#                                                               gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0),lasso_status=TRUE)
-# yhat(dat = readRDS("./sce9_200with400with0.9.rds"),test=dat_sim(n=20,p=400,
-#                                                                 beta_real=c(rep(1,5),rep(0,395)),
-#                                                                 gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0.9),lasso_status=TRUE)
+yhat(dat = readRDS("./sce9_20with400with0.rds"),test=dat_sim(n=20,p=400,
+                                                              beta_real=c(rep(1,5),rep(0,395)),
+                                                             gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0),lasso_status=TRUE)
+ yhat(dat = readRDS("./sce9_20with400with0.9.rds"),test=dat_sim(n=20,p=400,
+                                                               beta_real=c(rep(1,5),rep(0,395)),
+                                                                gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0.9),lasso_status=TRUE)
+yhat(dat = readRDS("./sce9_200with400with0.rds"),test=dat_sim(n=200,p=400,
+                                                               beta_real=c(rep(1,5),rep(0,395)),
+                                                               gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0),lasso_status=TRUE)
+ yhat(dat = readRDS("./sce9_200with400with0.9.rds"),test=dat_sim(n=200,p=400,
+                                                                beta_real=c(rep(1,5),rep(0,395)),
+                                                                 gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0.9),lasso_status=TRUE)
 
 
 
 #############################################
-sim_varguid2=function(n,p,beta_real,gamma_real,corrv,name){
+sim_varguid2=function(n,p,beta_real,gamma_real,corrv,name,nsim){
   beta_var=beta_lasso=vector(mode='list', p)
   dat=vector(mode='list', nsim)
   for (i in 1:nsim) {
@@ -164,45 +164,60 @@ round(mean(sce7_4$res[1001:2000,6:100] %>% apply(2,MSE0)),3) # var beta=0
 ##############
 ##############
 sce8_1=sim_varguid2(n=20,p=200,beta_real=c(rep(1,5),rep(0,195)),
-                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,190)),corrv=0,name="sce8")
+                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,190)),corrv=0,name="sce8",nsim=1000)
 round(mean(sce8_1$res[1:1000,1:5] %>% apply(2,MSE1)),3) #LASSO beta=1
 round(mean(sce8_1$res[1001:2000,1:5] %>% apply(2,MSE1)),3) # varguid beta=1
 round(mean(sce8_1$res[1:1000,6:200] %>% apply(2,MSE0)),3) # LASSO beta=0
-round(mean(sce8_1$res[1001:2000,2:100] %>% apply(2,MSE0)),3) # var beta=0
+round(mean(sce8_1$res[1001:2000,6:200] %>% apply(2,MSE0)),3) # var beta=0
 sce8_2=sim_varguid2(n=20,p=200,beta_real=c(rep(1,5),rep(0,195)),
-                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,190)),corrv=0.9,name="sce8") 
+                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,190)),corrv=0.9,name="sce8",nsim=1000) 
 
 round(mean(sce8_2$res[1:1000,1:5] %>% apply(2,MSE1)),3) #LASSO beta=1
 round(mean(sce8_2$res[1001:2000,1:5] %>% apply(2,MSE1)),3) # varguid beta=1
 round(mean(sce8_2$res[1:1000,6:200] %>% apply(2,MSE0)),3) # LASSO beta=0
-round(mean(sce8_2$res[1001:2000,2:100] %>% apply(2,MSE0)),3) # var beta=0
+round(mean(sce8_2$res[1001:2000,6:200] %>% apply(2,MSE0)),3) # var beta=0
 
 
 sce8_3=sim_varguid2(n=200,p=200,beta_real=c(rep(1,5),rep(0,195)),
-                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,190)),corrv=0,name="sce8") 
+                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,190)),corrv=0,name="sce8",nsim=1000) 
 round(mean(sce8_3$res[1:1000,1:5] %>% apply(2,MSE1)),3) #LASSO beta=1
 round(mean(sce8_3$res[1001:2000,1:5] %>% apply(2,MSE1)),3) # varguid beta=1
 round(mean(sce8_3$res[1:1000,6:200] %>% apply(2,MSE0)),3) # LASSO beta=0
-round(mean(sce8_3$res[1001:2000,2:100] %>% apply(2,MSE0)),3) # var beta=0
+round(mean(sce8_3$res[1001:2000,6:200] %>% apply(2,MSE0)),3) # var beta=0
 
 sce8_4=sim_varguid2(n=200,p=200,beta_real=c(rep(1,5),rep(0,195)),
-                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,190)),corrv=0.9,name="sce8") 
+                    gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,190)),corrv=0.9,name="sce8",nsim=1000) 
 round(mean(sce8_4$res[1:1000,1:5] %>% apply(2,MSE1)),3) #LASSO beta=1
 round(mean(sce8_4$res[1001:2000,1:5] %>% apply(2,MSE1)),3) # varguid beta=1
 round(mean(sce8_4$res[1:1000,6:200] %>% apply(2,MSE0)),3) # LASSO beta=0
-round(mean(sce8_4$res[1001:2000,2:100] %>% apply(2,MSE0)),3) # var beta=0
+round(mean(sce8_4$res[1001:2000,6:200] %>% apply(2,MSE0)),3) # var beta=0
 ##################
-# sce9_1=sim_varguid2(n=20,p=400,beta_real=c(rep(1,5),rep(0,395)),
-#                     gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0,name="sce9")
-# sce9_2=sim_varguid2(n=20,p=400,beta_real=c(rep(1,5),rep(0,390)),
-#                     gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0.9,name="sce9") 
-# 
-# sce9_3=sim_varguid2(n=200,p=400,beta_real=c(rep(1,5),rep(0,395)),
-#                     gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0,name="sce9") 
-# 
-# sce9_4=sim_varguid2(n=200,p=400,beta_real=c(rep(1,5),rep(0,395)),
-#                     gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0.9,name="sce9") 
+ sce9_1=sim_varguid2(n=20,p=400,beta_real=c(rep(1,5),rep(0,395)),
+                     gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0,name="sce9",nsim=100)
+round(mean(sce9_1$res[1:100,1:5] %>% apply(2,MSE1)),3) #LASSO beta=1
+round(mean(sce9_1$res[101:200,1:5] %>% apply(2,MSE1)),3) # varguid beta=1
+round(mean(sce9_1$res[1:100,6:400] %>% apply(2,MSE0)),3) # LASSO beta=0
+round(mean(sce9_1$res[101:200,6:400] %>% apply(2,MSE0)),3) # var beta=0
 
+
+ sce9_2=sim_varguid2(n=20,p=400,beta_real=c(rep(1,5),rep(0,395)),
+                     gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0.9,name="sce9",nsim=100) 
+ round(mean(sce9_2$res[1:100,1:5] %>% apply(2,MSE1)),3) #LASSO beta=1
+ round(mean(sce9_2$res[101:200,1:5] %>% apply(2,MSE1)),3) # varguid beta=1
+ round(mean(sce9_2$res[1:100,6:400] %>% apply(2,MSE0)),3) # LASSO beta=0
+ round(mean(sce9_2$res[101:200,6:400] %>% apply(2,MSE0)),3) # var beta=0
+ sce9_3=sim_varguid2(n=200,p=400,beta_real=c(rep(1,5),rep(0,395)),
+                     gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0,name="sce9",nsim=100) 
+ round(mean(sce9_3$res[1:100,1:5] %>% apply(2,MSE1)),3) #LASSO beta=1
+ round(mean(sce9_3$res[101:200,1:5] %>% apply(2,MSE1)),3) # varguid beta=1
+ round(mean(sce9_3$res[1:100,6:400] %>% apply(2,MSE0)),3) # LASSO beta=0
+ round(mean(sce9_3$res[101:200,6:400] %>% apply(2,MSE0)),3) # var beta=0
+ sce9_4=sim_varguid2(n=200,p=400,beta_real=c(rep(1,5),rep(0,395)),
+                     gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,390)),corrv=0.9,name="sce9",nsim=100) 
+ round(mean(sce9_3$res[1:100,1:5] %>% apply(2,MSE1)),3) #LASSO beta=1
+ round(mean(sce9_3$res[101:200,1:5] %>% apply(2,MSE1)),3) # varguid beta=1
+ round(mean(sce9_3$res[1:100,6:400] %>% apply(2,MSE0)),3) # LASSO beta=0
+ round(mean(sce9_3$res[101:200,6:400] %>% apply(2,MSE0)),3) # var beta=0
 
 ###########
 

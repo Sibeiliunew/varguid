@@ -1,6 +1,6 @@
 #source("./20240425/simulation/generate_function_simulation.R")
-source("./leash2.0.5.R")
-source("./VarGuid20240617.R")
+source("./leash2.0.6.R")
+source("./VarGuid20240626.R")
 library(glmnet)
 library(tidyverse)
 library(MASS)
@@ -14,12 +14,16 @@ nsim <- 1000
 
 dat_sim=function(n,p,beta_real,gamma_real,corrv){
   
+  if(p==1){
+    X <- as.matrix(rnorm(mean=0,n=n))
+  }else{
+  
     X <- as.matrix(rnorm_multi(n = n, 
                      mu = rep(0,p),
                      sd = rep(1,p),
                      r = corrv, 
                      #varnames = letters[1:p],
-                     empirical = FALSE))
+                     empirical = FALSE))}
      e=rnorm(n,sd = 1)     
      if ( ! is.null(gamma_real)){
      Y= as.matrix(X) %*% beta_real+ (1+X %*% gamma_real) *e  
@@ -28,7 +32,8 @@ dat_sim=function(n,p,beta_real,gamma_real,corrv){
   else{ Y2= as.matrix(X) %*% beta_real+ e 
         return(list(X=X,Y=Y2))
   }
-}
+  
+  }
 
 sim_varguid=function(n,p,beta_real,gamma_real,corrv,name){
   beta_var=beta_ols=vector(mode='list', p)

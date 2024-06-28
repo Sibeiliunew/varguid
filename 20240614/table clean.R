@@ -1,6 +1,6 @@
 source("./20240425/simulation/generate_function_simulation.R")
-source("./leash2.0.5.R")
-source("./VarGuid20240617.R")
+source("./leash2.0.6.R")
+source("./VarGuid20240626.R")
 library(glmnet)
 library(tidyverse)
 library(MASS)
@@ -401,6 +401,7 @@ ci_organize(dat,beta_real=c(rep(1,5),rep(0,5)))
 yhat=function(dat,test,lasso_status){
   rmse3 <- c()
   rmse_res3=NULL
+  nsim=length(dat)
   for( i in 1:nsim){ 
     dat_sub=as.data.frame(dat[[i]])
     same_name=colnames(test[[1]])
@@ -426,6 +427,29 @@ yhat=function(dat,test,lasso_status){
 return(colMeans(as.data.frame(rmse3[,c(6,1)])) )# mean for the 1000 nsim
 }
 ###############
+dat <- readRDS("../varguid data/20240601 simulated data/sce1_20with1with0.rds")
+test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
+             beta_real=1,
+             gamma_real=NULL,corrv=0)
+yhat(dat = dat,test=test,lasso_status=FALSE)
+
+
+dat <- readRDS("../20240601 simulated data/sce1_200with1with0.rds")
+test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
+             beta_real=1,
+             gamma_real=NULL,corrv=0)
+yhat(dat = dat,test=test,lasso_status=FALSE)
+
+
+
+
+
+
+
+
+
+###################################################
+###################################################
 dat <- readRDS("./20240601 simulated data/sce2_200with10with0.rds")
 test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,5)),
