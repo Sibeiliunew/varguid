@@ -15,7 +15,7 @@ nsim <- 1000
 dat_sim=function(n,p,beta_real,gamma_real,corrv){
   
   if(p==1){
-    X <- as.matrix(rnorm(mean=0,n=n))
+    X <- rnorm(mean=0,n=n)
   }else{
   
     X <- as.matrix(rnorm_multi(n = n, 

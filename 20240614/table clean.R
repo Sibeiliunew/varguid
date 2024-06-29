@@ -434,7 +434,7 @@ test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
 yhat(dat = dat,test=test,lasso_status=FALSE)
 
 
-dat <- readRDS("../20240601 simulated data/sce1_200with1with0.rds")
+dat <- readRDS("../varguid data/20240601 simulated data/sce1_200with1with0.rds")
 test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=1,
              gamma_real=NULL,corrv=0)
