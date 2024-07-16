@@ -412,8 +412,9 @@ yhat=function(dat,test,lasso_status){
               y.test = test[[2]])
     
     colnames(data$x.train) <- colnames(data$x.test)
-    
-    o <- lmv(X =as.matrix(data$x.train) , Y = unlist(data$y.train), lasso = lasso_status) # , lasso = TRUE
+    if(ncol(dat[[1]])==2){ o <- lmv(X =as.vector(data$x.train) , Y = as.vector(data$y.train), lasso = lasso_status)}
+    else{
+    o <- lmv(X =as.matrix(data$x.train) , Y = unlist(data$y.train), lasso = lasso_status)} # , lasso = TRUE
     
     y.obj <-   tryCatch({
       ymodv(o,gamma = c(seq(0,9, length.out=4)), phi = 0.46)#, rf = FALSE)
@@ -424,7 +425,8 @@ yhat=function(dat,test,lasso_status){
     rmse3 <- rbind(rmse3,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
   }
   
-return(colMeans(as.data.frame(rmse3[,c(6,1)])) )# mean for the 1000 nsim
+  
+return(colMeans(as.data.frame(rmse3[,1:ncol(rmse3)])) )# mean for the 1000 nsim
 }
 ###############
 dat <- readRDS("../varguid data/20240601 simulated data/sce1_20with1with0.rds")
@@ -450,14 +452,14 @@ yhat(dat = dat,test=test,lasso_status=FALSE)
 
 ###################################################
 ###################################################
-dat <- readRDS("./20240601 simulated data/sce2_200with10with0.rds")
+dat <- readRDS("../varguid data/20240601 simulated data/sce2_20with10with0.rds")
 test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,5)),
              gamma_real=c(rep(1,5),rep(0,5)),corrv=0)
 yhat(dat = dat,test=test,lasso_status=FALSE)
 
 
-dat <- readRDS("./20240601 simulated data/sce2_200with10with0.9.rds")
+dat <- readRDS("../varguid data/20240601 simulated data/sce2_20with10with0.9.rds")
 test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,5)),
              gamma_real=c(rep(1,5),rep(0,5)),corrv=0.9)
@@ -466,14 +468,14 @@ yhat(dat = dat,test=test,lasso_status=FALSE)
 ##########################################################################
 #########################################################################
 
-dat <- readRDS("./20240601 simulated data/sce3_200with10with0.rds")
+dat <- readRDS("../varguid data/20240601 simulated data/sce3_20with10with0.rds")
 test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,5)),
              gamma_real=NULL,corrv=0)
 yhat(dat = dat,test=test,lasso_status=FALSE)
 
 
-dat <- readRDS("./20240601 simulated data/sce3_200with10with0.9.rds")
+dat <- readRDS("../varguid data/20240601 simulated data/sce3_20with10with0.9.rds")
 test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,5)),
              gamma_real=NULL,corrv=0.9)
@@ -482,14 +484,14 @@ yhat(dat = dat,test=test,lasso_status=FALSE)
 ##########################################################################
 #########################################################################
 
-dat <- readRDS("./20240601 simulated data/sce4_200with10with0.rds")
+dat <- readRDS("../varguid data/20240601 simulated data/sce4_20with10with0.rds")
 test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,5)),
              gamma_real=c(rep(0,5),rep(1,5)),corrv=0)
 yhat(dat = dat,test=test,lasso_status=FALSE)
 
 
-dat <- readRDS("./20240601 simulated data/sce4_200with10with0.9.rds")
+dat <- readRDS("../varguid data/20240601 simulated data/sce4_20with10with0.9.rds")
 test=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
              beta_real=c(rep(1,5),rep(0,5)),
              gamma_real=c(rep(0,5),rep(1,5)),corrv=0.9)
@@ -499,39 +501,44 @@ yhat(dat = dat,test=test,lasso_status=FALSE)
 #########################################################################
 
 
-dat <- readRDS("./20240601 simulated data/sce5_20with15with0.rds")
-test_sce5_20with15with0=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
-                                 beta_real=c(rep(1,5),rep(0,10)),
-                                 gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0)
+dat <- readRDS("../varguid data/20240601 simulated data/sce5_20with15with0.rds")
+#test_sce5_20with15with0=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
+#                                 beta_real=c(rep(1,5),rep(0,10)),
+#                                 gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0)
 
-saveRDS(test_sce5_20with15with0,"test_sce5_20with15with0.rds")
+test_sce5_20with15with0=readRDS("../varguid data/test_sce5_20with15with0.rds")
 
 yhat(dat = dat,test=test_sce5_20with15with0,lasso_status=FALSE)
 
 
-dat <- readRDS("./20240601 simulated data/sce5_20with15with0.9.rds")
-test_sce5_20with15with0.9=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
-                                   beta_real=c(rep(1,5),rep(0,10)),
-                                   gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0.9)
+dat <- readRDS("../varguid data/20240601 simulated data/sce5_20with15with0.9.rds")
+#test_sce5_20with15with0.9=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
+#                                   beta_real=c(rep(1,5),rep(0,10)),
+#                                   gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0.9)
 #saveRDS(test_sce5_20with15with0.9,"test_sce5_20with15with0.9.rds")
 
+test_sce5_20with15with0.9=readRDS("../varguid data/test_sce5_20with15with0.9.rds")
 yhat(dat = dat,test=test_sce5_20with15with0.9,lasso_status=FALSE)
 
 
 
 
-dat <- readRDS("./20240601 simulated data/sce5_200with15with0.rds")
-test_sce5_200with15with0=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
-             beta_real=c(rep(1,5),rep(0,10)),
-             gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0)
-#saveRDS(test_sce5_200with15with0,"test_sce5_200with15with0.rds")
+dat <- readRDS("../varguid data/20240601 simulated data/sce5_200with15with0.rds")
+# test_sce5_200with15with0=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
+#              beta_real=c(rep(1,5),rep(0,10)),
+#              gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0)
+# #saveRDS(test_sce5_200with15with0,"test_sce5_200with15with0.rds")
+test_sce5_200with15with0=readRDS("../varguid data/test_sce5_200with15with0.rds")
 yhat(dat = dat,test=test_sce5_200with15with0,lasso_status=FALSE)
 
 
-dat <- readRDS("./20240601 simulated data/sce5_200with15with0.9.rds")
-test_sce5_200with15with0.9=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
-             beta_real=c(rep(1,5),rep(0,10)),
-             gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0.9)
+dat <- readRDS("../varguid data/20240601 simulated data/sce5_200with15with0.9.rds")
+# test_sce5_200with15with0.9=dat_sim(n=nrow(dat[[1]]),p=ncol(dat[[1]])-1,
+#              beta_real=c(rep(1,5),rep(0,10)),
+#              gamma_real=c(rep(0,4),c(0,1,2,3,4,5),rep(0,5)),corrv=0.9)
 
 #saveRDS(test_sce5_200with15with0.9,"test_sce5_200with15with0.9.rds")
+
+test_sce5_200with15with0.9=readRDS("../varguid data/test_sce5_200with15with0.9.rds")
+
 yhat(dat = dat,test=test_sce5_200with15with0.9,lasso_status=FALSE)
