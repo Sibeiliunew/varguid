@@ -402,9 +402,10 @@ yhat=function(dat,test,lasso_status){
   rmse3 <- c()
   rmse_res3=NULL
   nsim=length(dat)
+  
+  same_name=colnames(test[[1]])
   for( i in 1:nsim){ 
     dat_sub=as.data.frame(dat[[i]])
-    same_name=colnames(test[[1]])
     colnames(dat_sub[,1:(ncol(dat_sub)-1)])=same_name
     data=list(x.train = makeX(as.data.frame(dat_sub[,1:(ncol(dat_sub)-1)])),
               y.train = as.matrix(dat_sub[,ncol(dat_sub)]),
@@ -412,8 +413,7 @@ yhat=function(dat,test,lasso_status){
               y.test = test[[2]])
     
     colnames(data$x.train) <- colnames(data$x.test)
-    if(ncol(dat[[1]])==2){ o <- lmv(X =as.vector(data$x.train) , Y = as.vector(data$y.train), lasso = lasso_status)}
-    else{
+    if(ncol(dat[[1]])==2){ o <- lmv(X =as.vector(data$x.train) , Y = as.vector(data$y.train), lasso = lasso_status)}else{
     o <- lmv(X =as.matrix(data$x.train) , Y = unlist(data$y.train), lasso = lasso_status)} # , lasso = TRUE
     
     y.obj <-   tryCatch({
