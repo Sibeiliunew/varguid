@@ -2,7 +2,7 @@
 
 library(tidyverse)
 library(janitor)
-source('table1Setup.R')
+source('./old version/table1Setup.R')
 flash <- readRDS('flash.data.1003.rds') %>% filter(site != "VU")
 reduced <-
   flash |> 
@@ -74,25 +74,25 @@ reduced <-
 ######################################
 # Cat score sqrt score vs MSV VDP VH  FEV1, BMI
 ###### MSV
-reduced |>select(sgrq,MSV_exp) %>% drop_na() %>% 
+reduced |>dplyr::select(sgrq,MSV_exp) %>% drop_na() %>% 
   ggplot(aes(x = sgrq, y = MSV_exp)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'SGRQ category by quantile')
 
-reduced |>select(sgrq2,MSV_exp) %>% drop_na() %>% 
+reduced |>dplyr::select(sgrq2,MSV_exp) %>% drop_na() %>% 
   ggplot(aes(x = sgrq2, y = MSV_exp)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'SGRQ category by 20 unit')
 
-reduced |>select(CAT,MSV_exp) %>% drop_na() %>% 
+reduced |>dplyr::select(CAT,MSV_exp) %>% drop_na() %>% 
   ggplot(aes(x = CAT, y = MSV_exp)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'CAT category by quantile')
 
-reduced |>select(CAT2,MSV_exp) %>% drop_na() %>% 
+reduced |>dplyr::select(CAT2,MSV_exp) %>% drop_na() %>% 
   ggplot(aes(x = CAT2, y = MSV_exp)) +
   geom_boxplot() +
   theme_bw() +
@@ -100,74 +100,74 @@ reduced |>select(CAT2,MSV_exp) %>% drop_na() %>%
 
 ############
 ###### VH
-reduced |>select(sgrq,VH_exp) %>% drop_na() %>% 
+reduced |>dplyr::select(sgrq,VH_exp) %>% drop_na() %>% 
   ggplot(aes(x = sgrq, y = VH_exp)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'SGRQ category by quantile')
 
-reduced |>select(sgrq2,VH_exp) %>% drop_na() %>% 
+reduced |>dplyr::select(sgrq2,VH_exp) %>% drop_na() %>% 
   ggplot(aes(x = sgrq2, y = VH_exp)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'SGRQ category by 20 unit')
 
-reduced |>select(CAT,VH_exp) %>% drop_na() %>% 
+reduced |>dplyr::select(CAT,VH_exp) %>% drop_na() %>% 
   ggplot(aes(x = CAT, y = VH_exp)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'CAT category by quantile')
 
-reduced |>select(CAT2,VH_exp) %>% drop_na() %>% 
+reduced |>dplyr::select(CAT2,VH_exp) %>% drop_na() %>% 
   ggplot(aes(x = CAT2, y = VH_exp)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'CAT category by 8 unit')
 #############FEV1
-reduced |>select(sgrq,best_pre_fev1) %>% drop_na() %>% 
+reduced |>dplyr::select(sgrq,best_pre_fev1) %>% drop_na() %>% 
   ggplot(aes(x = sgrq, y = best_pre_fev1)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'SGRQ category by quantile')
 
-reduced |>select(sgrq2,best_pre_fev1) %>% drop_na() %>% 
+reduced |>dplyr::select(sgrq2,best_pre_fev1) %>% drop_na() %>% 
   ggplot(aes(x = sgrq2, y = best_pre_fev1)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'SGRQ category by 20 unit')
 
-reduced |>select(CAT,best_pre_fev1) %>% drop_na() %>% 
+reduced |>dplyr::select(CAT,best_pre_fev1) %>% drop_na() %>% 
   ggplot(aes(x = CAT, y = best_pre_fev1)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'CAT category by quantile')
 
-reduced |>select(CAT2,best_pre_fev1) %>% drop_na() %>% 
+reduced |>dplyr::select(CAT2,best_pre_fev1) %>% drop_na() %>% 
   ggplot(aes(x = CAT2, y = best_pre_fev1)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'CAT category by 8 unit')
 
 ###########BMI
-reduced |>select(sgrq,bmi_new) %>% drop_na() %>% 
+reduced |>dplyr::select(sgrq,bmi_new) %>% drop_na() %>% 
   ggplot(aes(x = sgrq, y = bmi_new)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'SGRQ category by quantile')
 
-reduced |>select(sgrq2,bmi_new) %>% drop_na() %>% 
+reduced |>dplyr::select(sgrq2,bmi_new) %>% drop_na() %>% 
   ggplot(aes(x = sgrq2, y = bmi_new)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'SGRQ category by 20 unit')
 
-reduced |>select(CAT,bmi_new) %>% drop_na() %>% 
+reduced |>dplyr::select(CAT,bmi_new) %>% drop_na() %>% 
   ggplot(aes(x = CAT, y = bmi_new)) +
   geom_boxplot() +
   theme_bw() +
   labs(x = 'CAT category by quantile')
 
-reduced |>select(CAT2,bmi_new) %>% drop_na() %>% 
+reduced |>dplyr::select(CAT2,bmi_new) %>% drop_na() %>% 
   ggplot(aes(x = CAT2, y = bmi_new)) +
   geom_boxplot() +
   theme_bw() +
