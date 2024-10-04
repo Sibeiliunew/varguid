@@ -15,91 +15,82 @@ lvd <- read.csv("resultLVD.csv")
 flash <- merge(lvd,flash,by.x = "study_id", by.y="record_id")
 
 
-dat=data.frame(scale(flash[,c("M.DF1","V.DF1")]),
+dat=data.frame(scale(flash[,c("M.DFM","V.DFM","M.PRR","V.PRR","M.PRN","V.PRN")]),
                       age=flash$age,
-                      #gender=factor(flash$gender-1),
-                      #smoke=factor(ifelse(is.na(flash$smokingpacks), 0, 1)),
+                      gender=flash$gender-1,
+                      smoke=ifelse(is.na(flash$smokingpacks), 0, 1),
                       bmi=flash$bmi,
                       sgrq_score=flash$total_sgrq_score,
                       cat_score=flash$cat_score
 ) %>% janitor::clean_names()
 
+####################
+flash <- readRDS("~/Documents/Dissertation/varguid/flash.data.1003.rds")
+
+dat=data.frame(scale(flash[,c("M.DFM","V.DFM","M.PRR","V.PRR","M.PRN","V.PRN")]),
+               age=flash$age,
+               gender=flash$gender-1,
+               smoke=ifelse(is.na(flash$smokingpacks), 0, 1),
+               bmi=flash$bmi,
+               sgrq_score=flash$total_sgrq_score,
+               cat_score=flash$cat_score
+) %>% janitor::clean_names()
+
 
 #################
-m2<- lm(cat_score~m_df1 , data = dat)
-ols_test_breusch_pagan(m2)
-ols_test_score(m2)
-ols_test_f(m2)
+table_fun=function(X,Y){
+  table=NULL
+for(i in 1:ncol(X)){
+  X1=X[,i]
+m2<- lm(Y~X1)
+w1=ols_test_score(m2)
+w2=ols_test_f(m2)
+w3=ols_test_breusch_pagan(m2)
 
-summary(m2)
-dat1=data.frame(X=dat$m_df1,Y=dat$sgrq_score)%>% drop_na()
+c1=summary(m2)$coefficients[-1,-3]
+dat1=data.frame(X=X1,Y=Y)%>% drop_na()
+df1=list(X2=dat1[,1:(ncol(dat1)-1)],Y=dat1$Y)
 
-m2.1<- lmv(X=dat1$X,Y=dat1$Y)
-summary(m2.1$obj.varGuid)
-rm(m2,m2.1,dat1)
-###############
-m2<- lm(sgrq_score~ v_df1, data = dat)
-ols_test_breusch_pagan(m2)
-ols_test_score(m2)
-ols_test_f(m2)
+m2.1<- lmv(X=df1$X2,Y=df1$Y)
+c2=summary(m2.1$obj.varGuid)$coefficients[-1,-3]
+res1=c(w1$score,w1$p,w2$f,w2$p,w3$bp,w3$p,c1,c2)
+table=rbind(table,res1)
+}
+  return(table)
+}
 
-summary(m2)
-dat1=data.frame(X=dat$v_df1,Y=dat$sgrq_score)%>% drop_na()
-m2.1<- lmv(X=dat1$X,Y=dat1$Y)
-summary(m2.1$obj.varGuid)
-rm(m2,m2.1,dat1)
+t1=round(as.data.frame(table_fun(X=dat[,1:10],Y=dat[,11])),4)
+write_csv(t1,"t_sgrq.csv")
 
-###############
-m2<- lm(sgrq_score~ age, data = dat)
-ols_test_breusch_pagan(m2)
-ols_test_score(m2)
-ols_test_f(m2)
+t2=round(as.data.frame(table_fun(X=dat[,1:10],Y=dat[,12])),4)
+write_csv(t2,"t_cat.csv")
 
-summary(m2)
-dat1=data.frame(X=dat$age,Y=dat$sgrq_score)%>% drop_na()
-m2.1<- lmv(X=dat1$X,Y=dat1$Y)
-summary(m2.1$obj.varGuid)
-
-rm(m2,m2.1,dat1)
-
-###############
-m2<- lm(cat_score~ bmi, data = dat)
-ols_test_breusch_pagan(m2)
-ols_test_score(m2)
-ols_test_f(m2)
-
-summary(m2)
-dat1=data.frame(X=dat$bmi,Y=dat$cat_score)%>% drop_na()
-m2.1<- lmv(X=dat1$X,Y=dat1$Y)
-summary(m2.1$obj.varGuid)
-
-rm(m2,m2.1,dat1)
-
-#######################################################
-#######################################################
+###################################
 #################
-m2<- lm(cat_score~ m_df1+v_df1+age+bmi, data = dat)
-ols_test_breusch_pagan(m2)
+m2<- lm(sgrq_score~ m_prn+v_prn+age+gender+smoke+bmi, data = dat)
 ols_test_score(m2)
 ols_test_f(m2)
+ols_test_breusch_pagan(m2)
+
 
 summary(m2)
 dat1=dat%>% drop_na()
 
-m2.1<- lmv(X=dat1[,1:4],Y=dat1[,6])
+m2.1<- lmv(X=dat1[,c(5,6,7:10)],Y=dat1[,11]) #  sgrq
 summary(m2.1$obj.varGuid)
-rm(m2,m2.1,dat1)
-###############
-m2<- lm(sgrq_score~ m_df1+v_df1+age+bmi, data = dat)
-ols_test_breusch_pagan(m2)
-ols_test_score(m2)
-ols_test_f(m2)
-
-summary(m2)
-dat1=dat%>% drop_na()
-m2.1<- lmv(X=dat1[,1:4],Y=dat1[,5])
-summary(m2.1$obj.varGuid)
-rm(m2,m2.1,dat1)
+rm(m2,dat1,m2.1)
 #######################################################
 #######################################################
 #################
+m2<- lm(cat_score~ m_prn+v_prn+age+gender+smoke+bmi, data = dat)
+ols_test_score(m2)
+ols_test_f(m2)
+ols_test_breusch_pagan(m2)
+
+
+summary(m2)
+dat1=dat%>% drop_na()
+
+m2.1<- lmv(X=dat1[,c(5,6,7:10)],Y=dat1[,12])#  cat
+summary(m2.1$obj.varGuid)
+rm(m2,dat1,m2.1)
