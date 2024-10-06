@@ -27,22 +27,25 @@ dat=data.frame(scale(flash[,c("M.DFM","V.DFM","M.PRR","V.PRR","M.PRN","V.PRN")])
 ####################
 flash <- readRDS("~/Documents/Dissertation/varguid/flash.data.1003.rds")
 
-dat=data.frame(scale(flash[,c("M.DFM","V.DFM","M.PRR","V.PRR","M.PRN","V.PRN")]),
-               age=flash$age,
-               gender=flash$gender-1,
-               smoke=ifelse(is.na(flash$smokingpacks), 0, 1),
-               bmi=flash$bmi,
-               sgrq_score=flash$total_sgrq_score,
-               cat_score=flash$cat_score
-) %>% janitor::clean_names()
+# dat=data.frame(scale(flash[,c("M.DFM","V.DFM","M.PRR","V.PRR","M.PRN","V.PRN")]),
+#                age=flash$age,
+#                gender=flash$gender-1,
+#                smoke=ifelse(is.na(flash$smokingpacks), 0, 1),
+#                bmi=flash$bmi,
+#                sgrq_score=flash$total_sgrq_score,
+#                cat_score=flash$cat_score
+# ) %>% janitor::clean_names()
 
+dat=flash[,c(5,6,19:95,111:118,124)] %>% mutate(gender=as.numeric(factor(gender,levels=c("male","female")))-1)
+
+dat[,3:87]=apply(dat[,3:87],2,scale)
 
 #################
 table_fun=function(X,Y){
   table=NULL
 for(i in 1:ncol(X)){
   X1=X[,i]
-m2<- lm(Y~X1)
+m2<- lm(Y~unlist(X1))
 w1=ols_test_score(m2)
 w2=ols_test_f(m2)
 w3=ols_test_breusch_pagan(m2)
@@ -56,14 +59,17 @@ c2=summary(m2.1$obj.varGuid)$coefficients[-1,-3]
 res1=c(w1$score,w1$p,w2$f,w2$p,w3$bp,w3$p,c1,c2)
 table=rbind(table,res1)
 }
+  colnames(table)=c("score_sta","score_p","f_sta","f_p","bp_sta",'bp_p',"Est","SE","P","Est","SE","P")
   return(table)
 }
 
-t1=round(as.data.frame(table_fun(X=dat[,1:10],Y=dat[,11])),4)
-write_csv(t1,"t_sgrq.csv")
+res1=as.data.frame(table_fun(X=dat,Y=flash$sgrq_score))
+t1=cbind(name=colnames(dat),round(res1,4))
+write_csv(t1,"sgrq.csv")
 
-t2=round(as.data.frame(table_fun(X=dat[,1:10],Y=dat[,12])),4)
-write_csv(t2,"t_cat.csv")
+res2=as.data.frame(table_fun(X=dat,Y=flash$cat_score))
+t2=cbind(name=colnames(dat),round(res2,4))
+write_csv(t2,"cat.csv")
 
 ###################################
 #################
