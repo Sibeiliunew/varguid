@@ -68,4 +68,44 @@ tb1=round(tb1,5)
     colnames(c2)=c("Est","SE","P")
 t=round(rbind(c1,c2),5)
 
+#############. the grouped plot bw bmi and sgrq
+
+prism2=prism %>% mutate( bmi1 = factor(
+  case_when(
+    sgrq_score <= 1.98319 ~ '25%',
+    sgrq_score <= 12.86662 ~ '50%',
+    sgrq_score <= 33.20831 ~ '75%',
+    sgrq_score <= 292.44498 ~ '100%'
+  ),
+  levels = c('25%', '50%', '75%', '100%'),
+  ordered = TRUE
+),
+bmi2 = factor(
+  case_when(
+    sgrq_score <= 20~ 'first',
+    sgrq_score <= 40 ~ 'second',
+    sgrq_score <= 60~ 'third',
+    sgrq_score <= 80  ~ 'forth',
+    sgrq_score > 80  ~ 'fifth'
+  ),
+  levels = c('first', 'second', 'third', 'forth','fifth'),
+  ordered = TRUE
+))
+
+
+prism2 |>dplyr::select(sgrq,bmi_median) %>% drop_na() %>% 
+  ggplot(aes(x = sgrq, y = bmi_median)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = 'SGRQ category by quantile')
+
+prism2 |>dplyr::select(sgrq2,bmi_median) %>% drop_na() %>% 
+  ggplot(aes(x = sgrq2, y = bmi_median)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = 'SGRQ category by 20 unit')
+
+
+
+
 
