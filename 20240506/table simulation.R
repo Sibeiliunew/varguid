@@ -1,4 +1,4 @@
-#source("./20240425/simulation/generate_function_simulation.R")
+source("./20240425/simulation/generate_function_simulation.R")
 source("./leash2.0.6.R")
 source("./VarGuid20240626.R")
 library(glmnet)
