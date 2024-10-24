@@ -38,9 +38,9 @@ dat_sim=function(n,p,beta_real,gamma_real,corrv){
 ######################################################################
 
 
-sim_varguid=function(n,p,beta_real,gamma_real,corrv,name,lasso_status){
+sim_varguid=function(n,p,beta_real,gamma_real,corrv,name,lasso_status=FALSE){
   
-  if(lasso_status==T){
+  if(lasso_status==TRUE){
     beta_var=beta_lasso=vector(mode='list', p)
     dat=vector(mode='list', nsim)
     for (i in 1:nsim) {
