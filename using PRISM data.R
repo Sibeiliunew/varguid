@@ -11,7 +11,7 @@ library(caTools)
 
 prism <- readRDS("prism.rds") %>% filter(lung_spiro != 'Missing') %>% filter(site =="Peru") %>% # "Nepal"  "Peru"  
   dplyr::select(id,age,sex,smokenow,biomass_current,bmi_median,education,
-         diagtb , diagchd ,diagdm,sgrq_score) %>% mutate(
+         diagtb , diagchd ,diagdm,sgrq_total_score) %>% mutate(
            sex=factor(sex),
            sex=as.numeric(sex)-1,
            smokenow=as.numeric(smokenow)-1,
@@ -45,21 +45,21 @@ table_fun2=function(X,Y){
   return(table)
 }
 
-tb1=table_fun2(X=prism[,2:10],Y=prism$sgrq_score )
+tb1=table_fun2(X=prism[,2:10],Y=prism$sgrq_total_score )
 tb1=round(tb1,5)
 
 
 
   
    df=prism[,2:11]
-    m2<- lm(sgrq_score~.,data=df)
+    m2<- lm(sgrq_total_score~.,data=df)
     w1=ols_test_score(m2)
     w2=ols_test_f(m2)
     w3=ols_test_breusch_pagan(m2)
     
     c1=summary(m2)$coefficients[-1,-3]
     dat1=df%>% drop_na()
-    df1=list(X2=dat1[,1:(ncol(dat1)-1)],Y=dat1$sgrq_score)
+    df1=list(X2=dat1[,1:(ncol(dat1)-1)],Y=dat1$sgrq_total_score)
     
     m2.1<- lmv(X=df1$X2,Y=df1$Y)
     c2=summary(m2.1$obj.varGuid)$coefficients[-1,-3]
@@ -72,21 +72,21 @@ t=round(rbind(c1,c2),5)
 
 prism2=prism %>% mutate( bmi1 = factor(
   case_when(
-    sgrq_score <= 1.98319 ~ '25%',
-    sgrq_score <= 12.86662 ~ '50%',
-    sgrq_score <= 33.20831 ~ '75%',
-    sgrq_score <= 292.44498 ~ '100%'
+    sgrq_total_score <= 1.98319 ~ '25%',
+    sgrq_total_score <= 12.86662 ~ '50%',
+    sgrq_total_score <= 33.20831 ~ '75%',
+    sgrq_total_score <= 292.44498 ~ '100%'
   ),
   levels = c('25%', '50%', '75%', '100%'),
   ordered = TRUE
 ),
 bmi2 = factor(
   case_when(
-    sgrq_score <= 20~ 'first',
-    sgrq_score <= 40 ~ 'second',
-    sgrq_score <= 60~ 'third',
-    sgrq_score <= 80  ~ 'forth',
-    sgrq_score > 80  ~ 'fifth'
+    sgrq_total_score <= 20~ 'first',
+    sgrq_total_score <= 40 ~ 'second',
+    sgrq_total_score <= 60~ 'third',
+    sgrq_total_score <= 80  ~ 'forth',
+    sgrq_total_score > 80  ~ 'fifth'
   ),
   levels = c('first', 'second', 'third', 'forth','fifth'),
   ordered = TRUE
