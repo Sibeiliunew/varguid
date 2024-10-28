@@ -9,7 +9,7 @@ library(faux)
 library(olsrr)
 library(caTools)
 
-prism <- readRDS("prism.rds") %>% filter(lung_spiro != 'Missing') %>% filter(site =="Peru") %>% # "Nepal"  "Peru"  
+prism <- readRDS("prism.rds") %>% filter(lung_spiro != 'Missing') %>% 
   dplyr::select(id,age,sex,smokenow,biomass_current,bmi_median,education,
          diagtb , diagchd ,diagdm,sgrq_total_score) %>% mutate(
            sex=factor(sex),
@@ -72,10 +72,10 @@ t=round(rbind(c1,c2),5)
 
 prism2=prism %>% mutate( bmi1 = factor(
   case_when(
-    sgrq_total_score <= 1.98319 ~ '25%',
-    sgrq_total_score <= 12.86662 ~ '50%',
-    sgrq_total_score <= 33.20831 ~ '75%',
-    sgrq_total_score <= 292.44498 ~ '100%'
+    sgrq_total_score <= quantile(prism$sgrq_total_score)[2] ~ '25%',
+    sgrq_total_score <= quantile(prism$sgrq_total_score)[3] ~ '50%',
+    sgrq_total_score <= quantile(prism$sgrq_total_score)[4] ~ '75%',
+    sgrq_total_score <= quantile(prism$sgrq_total_score)[5] ~ '100%'
   ),
   levels = c('25%', '50%', '75%', '100%'),
   ordered = TRUE
