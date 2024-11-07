@@ -73,7 +73,7 @@ path=c("./20240424/concrete+compressive+strength/Concrete_Data.xls",
        "./20240424/Airfoil.xlsx",
        "./20240424/Real estate valuation data set.xlsx",
        "./20240424/mcs_ds_edited_iter_shuffled.xlsx")
-flash <- readRDS("flash.rds")
+flash <- readRDS("flash.data.1003.rds")
 real=data.frame(MSV_exp= flash$MSV_exp,MSV_insp=flash$MSV_insp,VH_exp= flash$VH_exp,VH_insp=flash$VH_insp,
                VDP_exp= flash$VDP_exp, VDP_insp=flash$VDP_insp, TV_exp= flash$TV_exp, TV_insp=flash$TV_insp,FEV1=flash$best_pre_fev1,
                age=flash$age,bmi=flash$bmi_new,cat_score=flash$cat_score

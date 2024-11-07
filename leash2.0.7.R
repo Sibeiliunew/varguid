@@ -112,7 +112,7 @@ nums <- unlist(lapply(data, is.numeric))
 obj <- covx(as.matrix(dat.x[,nums]),knn = knn,
             gamma = gamma,phi = phi)
 w <- obj$w
-n <- max(dim(obj$sol$U[[1]]))
+n <- dim(obj$sol$U[[1]])[2]
 A <- create_adjacency(obj$sol$V[[1]],w,n)
 rdef.all <- find_clusters(A)
 data$z <- as.factor(as.character(rdef.all$cluster))

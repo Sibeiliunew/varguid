@@ -1,5 +1,5 @@
 source("./20240425/simulation/generate_function_simulation.R")
-source("./20240425/leash2.0.2.R")
+source("./leash2.0.6.R")
 library(glmnet)
 library(tidyverse)
 ####################################################################
