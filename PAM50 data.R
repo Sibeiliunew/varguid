@@ -11,12 +11,13 @@ library(faux)
 library(olsrr)
 library(caTools)
 library(caret)
+library(pheatmap)
 
 #genes=load("~/Documents/Dissertation/varguid/PAM50.RData")
 
 ##### p=50
   rmse=NULL
-  real= real=as.data.frame(cbind(genes,outcome)) %>% drop_na(outcome)
+  real= as.data.frame(cbind(genes,outcome)) %>% drop_na(outcome)
   #real = na.omit(real)
   real <- cbind(makeX(real[,1:(ncol(real)-1)]), real[,ncol(real)])
   folds=createFolds(1:nrow(real), k = 10) ## 10 cv
@@ -45,6 +46,4 @@ library(caret)
   
   table1=colMeans(as.data.frame(rmse))
   table1
-  
-####### p>> n
 
