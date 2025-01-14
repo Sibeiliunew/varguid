@@ -15,7 +15,7 @@ library(dendsort)
 library(egg)
 library(gridExtra)
 sort_hclust <- function(...) as.hclust(dendsort(as.dendrogram(...)))
-breaks=seq(5,20,by=0.25)
+breaks=seq(0,20,by=0.25)
 
 #genes=load("~/Documents/Dissertation/varguid/PAM50.RData")
 
@@ -28,48 +28,32 @@ p20133=as.data.frame(cbind(genes,outcome)) %>% drop_na(outcome)
 c1=sort_hclust(hclust(dist(t(p50[,-51])))) ## col order
 r1=sort_hclust(hclust(dist(p50[,-51]))) ## row order
 
-#q_vec=quantile(outcome,na.rm= T)
+pheatmap(as.matrix(p50[,-51]),
+         fontsize_col = 10,
+         fontsize_row = 10,
+         display_numbers = F,
+         number_color = "black", 
+         cluster_cols = c1,
+         breaks = breaks,
+         cluster_rows = F,
+         color=colorRampPalette(c("green", "black", "red"))(length(breaks)),
+         fontsize_number = 6,#
+         border_color = "black",
+         legend=T,
+         show_colnames = T, show_rownames = F,
+         main=c("50 Gene expression based on outcome decresing row order"))
 
-# cut1=p50 %>% filter(outcome<=q_vec[2]) %>% dplyr::select(-outcome)
-# cut2=p50 %>% filter(q_vec[2]<outcome & outcome<=q_vec[3])%>% dplyr::select(-outcome)
-# cut3=p50 %>% filter(q_vec[3]<outcome & outcome<=q_vec[4])%>% dplyr::select(-outcome)
-# cut4=p50 %>% filter(q_vec[4]<outcome & outcome<=q_vec[5])%>% dplyr::select(-outcome)
 
 
-#plot(cut1_cluster_gene, main = "Sorted Dendrogram in outcome 1st quantile", xlab = "", sub = "",ylab = "")
-
-p_heatmap=function(data,title,col_order){
-  r=NULL
-  for(i in 1:4){
-  p1=pheatmap(data[[i]] ,
-           fontsize_col = 10,
-           fontsize_row = 10,
-           display_numbers = F,
-           number_color = "black", 
-           cluster_cols = col_order,
-           breaks = breaks,
-           cluster_rows = F,
-           color=colorRampPalette(c("green", "black", "red"))(length(breaks)),
-           fontsize_number = 6,#
-           border_color = "black",
-           show_colnames = T, show_rownames = F,
-           main = title[i])
-  r[[i]]=p1[[4]]
-  }
-  return(r)
-}
-d1=list(p50[r1[["order"]][1:12],-51],p50[r1[["order"]][13:24],-51],
-        p50[r1[["order"]][25:36],-51],p50[r1[["order"]][37:49],-51])
-t1=paste0("Gene expression in ",1:4," quantile,based on hclust row order")
-res1=p_heatmap(data=d1,title=t1,col_order=c1)
-do.call(grid.arrange,res1)
-
-d1_1=list(p50[1:12,-51],p50[13:24,-51],
-        p50[25:36,-51],p50[37:49,-51])
-t1_1=paste0("Gene expression in ",1:4," quantile,based on outcome decresing row order")
-res1_1=p_heatmap(data=d1_1,title=t1_1,col_order=c1)
-do.call(grid.arrange,res1_1)
-
+# p50=p50 %>% dplyr::select(col1)
+# 
+# d1_1=list(p50[1:12,-51],p50[13:24,-51],
+#         p50[25:36,-51],p50[37:49,-51])
+# t1_1=c("Gene expression based on outcome decresing row order")
+# 
+# res1_1=p_heatmap(data=d1_1 ,title=t1_1,col_order=c1)
+# grid.arrange(arrangeGrob(grobs= res1_1,ncol=1))
+# 
 
 ########### in p20133 data,use varguid lasso to select genes
 set.seed(2024)
@@ -79,19 +63,23 @@ select_gene=rownames(m) # 34
 
 p34=p20133 %>% dplyr::select(select_gene,outcome)%>% arrange(desc(outcome))
 c2=sort_hclust(hclust(dist(t(p34[,-35]))))
-###################
-d2=list(p34[r1[["order"]][1:12],-35],p34[r1[["order"]][13:24],-35],
-        p34[r1[["order"]][25:36],-35],p34[r1[["order"]][37:49],-35])
-t2=paste0("34 Varguild-lasso selected GE in ",1:4," quantile based on hclust row order")
-res2=p_heatmap(data=d2,title=t2,col_order=c2)
-do.call(grid.arrange,res2)
-##################################
+breaks2=seq(0,15,by=0.25)
+pheatmap(p34[,-35],
+         fontsize_col = 10,
+         fontsize_row = 10,
+         display_numbers = F,
+         number_color = "black", 
+         cluster_cols = c2,
+         breaks = breaks2,
+         cluster_rows = F,
+         color=colorRampPalette(c("green", "black", "red"))(length(breaks2)),
+         fontsize_number = 6,#
+         border_color = "black",
+         legend=T,
+         show_colnames = T, show_rownames = F,
+         main=c("Var-guild selected 34 Gene expression based on outcome decresing row order"))
 
-d2_2=list(p34[1:12,-35],p34[13:24,-35],
-        p34[25:36,-35],p34[37:49,-35])
-t2_2=paste0("34 Varguild-lasso selected GE in ",1:4," quantile based on outcome decresing row order")
-res2_2=p_heatmap(data=d2_2,title=t2_2,col_order=c2)
-do.call(grid.arrange,res2_2)
+
 
   ########### in p20133 data,use traditional lasso to select genes
   set.seed(2024)
@@ -105,15 +93,31 @@ do.call(grid.arrange,res2_2)
   p16=p20133 %>% dplyr::select(select_gene2,outcome) %>%arrange(desc(outcome))
   c3=sort_hclust(hclust(dist(t(p16[,-17]))))
   
-  d3=list(p16[r1[["order"]][1:12],-17],p16[r1[["order"]][13:24],-17],
-          p16[r1[["order"]][25:36],-17],p16[r1[["order"]][37:49],-17])
-  t3=paste0("16 Lasso selected genesexpression in ",1:4," quantile based on hclust row order")
-  res3=p_heatmap(data=d3,title=t3,col_order=c3)
-  do.call(grid.arrange,res3)
+
+ ############################
+
+  # Reorder selected_gene2 to match the order in selected_gene
+  select_gene2_ordered <- select_gene2[match(c0, select_gene2, nomatch = 0)]
   
-  d3_3=list(p16[1:12,-17],p16[13:24,-17],
-            p16[25:36,-17],p16[37:49,-17])
-  t3_3=paste0("16 Lasso selected GE in ",1:4," quantile based on outcome decresing row order")
-  res3_3=p_heatmap(data=d3_3,title=t3_3,col_order=c3)
-  do.call(grid.arrange,res3)
- 
+  # Remove NA values resulting from genes in selected_gene that are not in selected_gene2
+  select_gene2_ordered <- select_gene2_ordered[select_gene2_ordered != ""]
+  
+  #pheatmap(p16[,c(select_gene2_ordered,"SPIRE2")],
+  pheatmap(p16[,c("GALNT9", "SPANXB1","NBPF4","NBPF6","HUS1B","SYNGR4","ABHD16B","SPIRE2","NUDT8","LOC100506870","AIFM3",
+                  "CDK2AP2","HDAC10" ,"CHST12","IER5L","ELF3" )],
+           fontsize_col = 10,
+           fontsize_row = 10,
+           display_numbers = F,
+           number_color = "black", 
+           cluster_cols = F,
+           breaks = breaks2,
+           cluster_rows = F,
+           color=colorRampPalette(c("green", "black", "red"))(length(breaks2)),
+           fontsize_number = 6,#
+           border_color = "black",
+           legend=T,
+           show_colnames = T, show_rownames = F,
+           main=c("Lasso selected 16 Gene expression based on outcome decresing row order"))
+  
+
+  

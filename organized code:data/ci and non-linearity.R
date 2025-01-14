@@ -5,7 +5,7 @@ library(xtable)
 library(scales)
 library(caTools)
 source("./20240412/VarGuid20240412.R")
-source("./20240412/leash2.0.R")
+source("./leash2.0.7.R")
 
 n=1000
 nsim=500

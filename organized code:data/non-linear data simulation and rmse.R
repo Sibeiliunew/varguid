@@ -1,4 +1,5 @@
 source("./20240425/simulation/generate_function_simulation.R")
+source("./VarGuid20240626.R")
 source("./leash2.0.6.R")
 library(glmnet)
 library(tidyverse)
@@ -59,7 +60,71 @@ table3
 
 n <- 100
 d <- 200
-#corrv <- c(0, .9)[2]
+corrv <- c(0, .9)[1] ## change
+rmse_res1=NULL
+rmse_res2=NULL
+######
+for (c in 1:10){
+  set.seed(2024)
+  simo <- simulation.sum[[simnames[c]]](n=n, d=d, corrv = corrv)$dta
+    print(c)
+    data=list(x = makeX(simo[,1:(ncol(simo)-1)]),
+              y= simo[,ncol(simo)])
+    ### Varguild Lasso
+    set.seed(2024)
+    o1 <- lmv(X =as.matrix(data$x) , Y = unlist(data$y), lasso = TRUE)
+    m=as.data.frame(as.matrix(o1$beta)) %>% filter(s0>0)
+    n1=nrow(m)
+    select1=rownames(m) # 
+    ### Lasso
+    set.seed(2024)
+    o2 <- cv.glmnet(x =as.matrix(data$x) , y = data$y,alpha = 1,lambda =exp(seq(-10,10,length=200) ))
+    m2=as.data.frame(as.matrix(coef(o2, s = "lambda.min"))) %>% filter(s1>0)
+    n2=nrow(m2)
+    select1=rownames(m2) 
+    
+    n_ol=length(intersect(select1,select2))
+    
+  rmse_res1[[c]]=c(n1,n2,n_ol)
+}
+
+table1=do.call("rbind",rmse_res1)
+table2=do.call("rbind",rmse_res2)
+
+
+
+######RMSE
+for (c in 1:10){
+  for( i in 1:50){
+    print(i)
+    simo <- simulation.sum[[simnames[c]]](n=n, d=d, corrv = corrv)$dta
+    trn <- sample.split(1:n, SplitRatio = 0.75)
+    train  <- subset(simo, trn==TRUE)
+    test   <- subset(simo, trn==FALSE)
+    data=list(x.train = makeX(train[,1:(ncol(simo)-1)]),
+              y.train = train[,ncol(simo)],
+              x.test = makeX(test[,1:(ncol(simo)-1)]),
+              y.test = test[,ncol(simo)])
+    
+    o <- lmv(X =as.matrix(data$x.train) , Y = unlist(data$y.train), lasso = TRUE) # , lasso = TRUE
+    y.obj <-ymodv(obj = o,gamma = c(seq(0,9, length.out=5)), phi = 0.46)#, rf = FALSE)
+    
+    
+    pred <- fnpred(mod=y.obj,lmvo = o,newdata = data$x.test)
+    
+    rmse4 <- rbind(rmse,sqrt(colMeans((matrix(rep(data$y.test,ncol(pred)),length(data$y.test))-pred)^2)) )
+  }
+  rmse_res4[[c]]=colMeans(as.data.frame(rmse4))
+}
+
+table4=do.call("rbind",rmse_res4)
+table4
+
+
+
+
+
+
 rmse4 <- c()
 rmse_res4=NULL
 
@@ -123,13 +188,48 @@ yindex <- which.max(abs(as.vector(o$beta)))
 print(colnames(x)[yindex])
 }
 
-c=10
-realDat[[c]] <- data.frame(y = dat$x[,yindex ],dat$x[,-yindex ])
-names(realDat)[c] <- 'subramanian'
+outcomes=c("X765","OSM_P188_F","g1CNS26","D28473-s-at","V2006","V10234","898_s_at","V132","34320_at","BAX")
+realDat=NULL
+for (i in 1:length(data.names)){
+  nm <- data.names[i]
+  data(list=nm, package = 'datamicroarray')
+  x <- eval(parse(text=nm))$x
+  if(i == 8){realDat[[i]] <- cbind(x[,-132],x[,132])} else{
+  index=which(colnames(x)==outcomes[i])
+  x <- scale(x)
+  realDat[[i]] <- cbind(x[,-index],x[,index])}
+}
+
 
 
 ##############
+rmse_res4=NULL
+for (c in 1:10){
+  real <- realDat[[c]]
+    print(c)
+    #trn <- sample.split(1:nrow(real), SplitRatio = 0.75)
+    data=list(x = makeX(as.data.frame(real[,1:(ncol(real)-1)])),
+              y= real[,ncol(real)])
+    ### Varguild Lasso
+    set.seed(2024)
+    o1 <- lmv(X =as.matrix(data$x) , Y = unlist(data$y), lasso = TRUE)
+    m=as.data.frame(as.matrix(o1$beta)) %>% filter(s0>0)
+    n1=nrow(m)
+    select1=rownames(m) # 
+    ### Lasso
+    o2 <- cv.glmnet(x =as.matrix(data$x) , y = data$y,alpha = 1,lambda =exp(seq(-10,10,length=200) ))
+    m2=as.data.frame(as.matrix(coef(o2, s = "lambda.min"))) %>% filter(s1>0)
+    n2=nrow(m2)
+    select2=rownames(m2) 
+    
+    n_ol=length(intersect(select1,select2))
+    
+  rmse_res4[[c]]=c(n1,n2,n_ol)
+}
 
+table4=do.call("rbind",rmse_res4)
+
+####### RMSE
 #corrv <- c(0, .9)[1]
 #rmse4 <- c()
 #rmse_res4=NULL
